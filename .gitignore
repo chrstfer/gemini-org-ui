@@ -1,6 +1,8 @@
 # Created by https://www.toptal.com/developers/gitignore/api/typescript,deno,emacs
 # Edit at https://www.toptal.com/developers/gitignore?templates=typescript,deno,emacs
 
+web-ext-artifacts/
+
 ### Deno ###
 /.idea/
 /.vscode/
