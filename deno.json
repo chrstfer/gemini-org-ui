@@ -6,7 +6,9 @@
   },
   "tasks": {
     "build": "deno run -A build.ts",
-    "watch": "deno run -A build.ts --watch",
+    "build:dev": "deno run -A build.ts --dev",
+    "dev": "deno run -A build.ts --dev",
+    "watch": "deno run -A build.ts --dev --watch",
     "test": "deno test -A tests/",
     "lint": "deno lint",
     "fmt": "deno fmt",

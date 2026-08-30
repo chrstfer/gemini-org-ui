@@ -3,6 +3,7 @@
  */
 
 export interface CodeBlockRecord {
+    id: string;
     blockEl: HTMLElement;
     preEl: HTMLElement;
     codeEl: HTMLElement;
@@ -10,7 +11,6 @@ export interface CodeBlockRecord {
     toolbarEl: HTMLElement;
     toggleBtn: HTMLButtonElement;
     foldAllBtn: HTMLButtonElement;
-    copyOrgBtn: HTMLButtonElement;
     isRendered: boolean;
     allFolded: boolean;
     lastText: string;

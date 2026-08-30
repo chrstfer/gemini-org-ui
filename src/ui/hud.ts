@@ -24,38 +24,45 @@ export class HudController {
 
         const hud = document.createElement("div");
         hud.id = "orgmod-hud";
+        hud.setAttribute("data-gemini-org", "hud");
         hud.innerHTML = `
-      <div class="orgmod-hud-header" id="orgmod-hud-toggle">
-        <span class="orgmod-hud-title">⚡ OrgUI</span>
-        <span class="orgmod-hud-collapse-icon" id="orgmod-hud-collapse-btn">${s.hudCollapsed ? "+" : "−"}</span>
+      <div class="orgmod-hud-header" id="orgmod-hud-toggle" data-gemini-org="hud-header">
+        <span class="orgmod-hud-title" data-gemini-org="hud-title">⚡ OrgUI</span>
+        <span class="orgmod-hud-collapse-icon" id="orgmod-hud-collapse-btn" data-gemini-org="hud-collapse-btn">${
+            s.hudCollapsed ? "+" : "−"
+        }</span>
       </div>
-      <div class="orgmod-hud-body" id="orgmod-hud-body" style="display: ${s.hudCollapsed ? "none" : "flex"}">
+      <div class="orgmod-hud-body" id="orgmod-hud-body" data-gemini-org="hud-body" style="display: ${
+            s.hudCollapsed ? "none" : "flex"
+        }">
         <div class="orgmod-hud-row">
           <button class="orgmod-hud-btn ${
             s.fullWidth ? "active" : ""
-        }" id="orgmod-hud-width" title="Toggle Full-Screen Width (Alt+W)">Width: ${
+        }" id="orgmod-hud-width" data-gemini-org="hud-width" title="Toggle Full-Screen Width (Alt+W)">Width: ${
             s.fullWidth ? `${s.widthPercent}%` : "Off"
         }</button>
-          <div class="orgmod-hud-presets">
+          <div class="orgmod-hud-presets" data-gemini-org="hud-presets">
             <button class="orgmod-hud-preset ${
             s.widthPercent === 80 && s.fullWidth ? "active" : ""
-        }" data-val="80">80%</button>
+        }" data-gemini-org="hud-preset" data-val="80">80%</button>
             <button class="orgmod-hud-preset ${
             s.widthPercent === 90 && s.fullWidth ? "active" : ""
-        }" data-val="90">90%</button>
+        }" data-gemini-org="hud-preset" data-val="90">90%</button>
             <button class="orgmod-hud-preset ${
             s.widthPercent === 94 && s.fullWidth ? "active" : ""
-        }" data-val="94">94%</button>
+        }" data-gemini-org="hud-preset" data-val="94">94%</button>
             <button class="orgmod-hud-preset ${
             s.widthPercent === 100 && s.fullWidth ? "active" : ""
-        }" data-val="100">100%</button>
+        }" data-gemini-org="hud-preset" data-val="100">100%</button>
           </div>
         </div>
         <div class="orgmod-hud-row">
           <button class="orgmod-hud-btn ${
             s.autoRenderOrg ? "active" : ""
-        }" id="orgmod-hud-auto" title="Auto-render Org Mode Blocks">Auto-Org: ${s.autoRenderOrg ? "ON" : "OFF"}</button>
-          <button class="orgmod-hud-btn" id="orgmod-hud-renderall" title="Toggle Render All Blocks (Alt+O)">Render All</button>
+        }" id="orgmod-hud-auto" data-gemini-org="hud-auto" title="Auto-render Org Mode Blocks">Auto-Org: ${
+            s.autoRenderOrg ? "ON" : "OFF"
+        }</button>
+          <button class="orgmod-hud-btn" id="orgmod-hud-renderall" data-gemini-org="hud-renderall" title="Toggle Render All Blocks (Alt+O)">Render All</button>
         </div>
       </div>
     `;
@@ -79,9 +86,11 @@ export class HudController {
             this.update();
         });
 
-        document.querySelectorAll(".orgmod-hud-preset").forEach((btn) => {
+        document.querySelectorAll<HTMLElement>('.orgmod-hud-preset, [data-gemini-org="hud-preset"]').forEach((
+            btn,
+        ) => {
             btn.addEventListener("click", () => {
-                const val = parseInt((btn as HTMLElement).dataset.val || "94", 10);
+                const val = parseInt(btn.dataset.val || "94", 10);
                 this.store.update({ widthPercent: val, fullWidth: true });
                 this.layout.apply(this.store.settings);
                 this.update();
@@ -128,8 +137,10 @@ export class HudController {
             widthBtn.classList.toggle("active", s.fullWidth);
         }
 
-        document.querySelectorAll(".orgmod-hud-preset").forEach((btn) => {
-            const val = parseInt((btn as HTMLElement).dataset.val || "94", 10);
+        document.querySelectorAll<HTMLElement>('.orgmod-hud-preset, [data-gemini-org="hud-preset"]').forEach((
+            btn,
+        ) => {
+            const val = parseInt(btn.dataset.val || "94", 10);
             btn.classList.toggle("active", s.fullWidth && s.widthPercent === val);
         });
 

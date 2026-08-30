@@ -317,7 +317,11 @@ export function parseOrgDocument(rawOrg: string): OrgDocument {
 
         // 8. Blank lines and Paragraphs
         if (trimmed === "") {
-            currentContainer().push({ type: "blank_line" });
+            const container = currentContainer();
+            // Collapse multiple blank lines so we never produce large vertical empty voids
+            if (container.length > 0 && container[container.length - 1].type !== "blank_line") {
+                container.push({ type: "blank_line" });
+            }
         } else {
             currentContainer().push({ type: "paragraph", text: line });
         }

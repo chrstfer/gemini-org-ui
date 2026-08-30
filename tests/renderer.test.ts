@@ -55,7 +55,8 @@ All set.`;
 :END:`;
 
         const html = OrgParser.render(doc);
-        assert.ok(html.includes('<details class="org-drawer" open>'));
+        assert.ok(html.includes('class="org-drawer"'));
+        assert.ok(html.includes('data-gemini-org="drawer"'));
         assert.ok(html.includes(":PROPERTIES:"));
         assert.ok(html.includes(":CPU:"));
         assert.ok(html.includes("AMD Ryzen 9"));
@@ -70,7 +71,8 @@ All set.`;
 | Latency | 50 | 12.8ms | TRUE |`;
 
         const html = OrgParser.render(doc);
-        assert.ok(html.includes('<table class="org-table">'));
+        assert.ok(html.includes('class="org-table"'));
+        assert.ok(html.includes('data-gemini-org="table"'));
         assert.ok(html.includes("org-table-header-row"));
         assert.ok(html.includes('<th class="">Metric</th>'));
         assert.ok(html.includes('<th class="">Sample</th>'));
@@ -86,6 +88,7 @@ def test():
 
         const html = OrgParser.render(doc);
         assert.ok(html.includes("org-src-block"));
+        assert.ok(html.includes('data-gemini-org="src-block"'));
         assert.ok(html.includes("PYTHON"));
         assert.ok(html.includes("org-src-copy-btn"));
         assert.ok(html.includes("def test():"));

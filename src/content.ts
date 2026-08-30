@@ -2,6 +2,8 @@
  * Main Content Script Entry Point
  */
 
+declare const __DEV__: boolean;
+
 import { CodeBlockManager } from "./dom/code-block.ts";
 import { DomObserver } from "./dom/observer.ts";
 import { LayoutManager } from "./layout/layout-manager.ts";
@@ -14,11 +16,14 @@ async function bootstrap() {
     const codeBlockManager = new CodeBlockManager(store);
 
     const handleRenderAll = () => {
-        const allButtons = document.querySelectorAll<HTMLButtonElement>(".org-toggle-btn");
-        const anyUnrendered = Array.from(allButtons).some((b) => !b.classList.contains("is-active"));
-        allButtons.forEach((b) => {
-            if (anyUnrendered && !b.classList.contains("is-active")) b.click();
-            else if (!anyUnrendered && b.classList.contains("is-active")) b.click();
+        const records = codeBlockManager.getAllRecords();
+        const anyUnrendered = records.some((r) => !r.isRendered);
+        records.forEach((r) => {
+            if (anyUnrendered && !r.isRendered) {
+                r.toggleBtn.click();
+            } else if (!anyUnrendered && r.isRendered) {
+                r.toggleBtn.click();
+            }
         });
     };
 
@@ -54,6 +59,49 @@ async function bootstrap() {
             handleRenderAll();
         }
     });
+
+    // 6. Debug Build Feature: Expose DevTools Inspection API only in dev mode
+    const isDevelopment = typeof __DEV__ !== "undefined" && __DEV__;
+    if (isDevelopment) {
+        const api = {
+            inspect: () => {
+                const records = codeBlockManager.getAllRecords();
+                console.log("[GeminiOrgMod DEBUG] Total registered blocks:", records.length);
+                console.table(
+                    records.map((r) => ({
+                        id: r.id,
+                        rendered: r.isRendered,
+                        allFolded: r.allFolded,
+                        textLength: r.lastText.length,
+                        hasPre: !!r.preEl,
+                        hasRenderedView: !!r.renderedEl,
+                        renderedRect: r.renderedEl ? r.renderedEl.getBoundingClientRect() : null,
+                    })),
+                );
+                return records;
+            },
+            getBlocks: () => codeBlockManager.getAllRecords(),
+            getBlock: (id: string) => codeBlockManager.getRecord(id),
+            getSettings: () => store.settings,
+            renderAll: handleRenderAll,
+            scan: () => observer.scan(),
+        };
+
+        (globalThis as unknown as Record<string, unknown>).__GeminiOrgMod = api;
+
+        // CustomEvent bridge allowing trigger from page context or console without Xray wrapper restrictions
+        globalThis.addEventListener("gemini-org-inspect", () => {
+            api.inspect();
+        });
+
+        // Add 1-click debug trigger to HUD in dev mode
+        const hudTitle = document.querySelector<HTMLElement>(".orgmod-hud-title");
+        if (hudTitle) {
+            hudTitle.title = "Click to inspect registered blocks in console (Dev mode)";
+            hudTitle.style.cursor = "pointer";
+            hudTitle.addEventListener("click", () => api.inspect());
+        }
+    }
 }
 
 if (typeof document !== "undefined") {
