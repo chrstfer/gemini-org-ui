@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini Org & Full-Width UI Mod - Test Fixture</title>
+  <link rel="stylesheet" href="dist/content.css">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #131314;
+      color: #e3e3e3;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header.gemini-topbar {
+      height: 56px;
+      border-bottom: 1px solid #282a2c;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-weight: 600;
+      font-size: 15px;
+      color: #8ab4f8;
+      background: #1e1f20;
+    }
+    .gemini-topbar-controls {
+      display: flex;
+      gap: 10px;
+    }
+    .demo-stream-btn {
+      background: #1a3b5c;
+      border: 1px solid #3b82f6;
+      color: #93c5fd;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .demo-stream-btn:hover {
+      background: #255483;
+      color: #fff;
+    }
+    /* Native Gemini narrow default */
+    .conversation-container {
+      max-width: 768px;
+      margin: 0 auto;
+      padding: 24px 16px 140px 16px;
+      flex: 1;
+      width: 100%;
+      transition: max-width 0.2s ease, width 0.2s ease;
+    }
+    .user-query-container {
+      background: #1e1f20;
+      padding: 14px 20px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+      display: inline-block;
+      max-width: 80%;
+      align-self: flex-end;
+      line-height: 1.5;
+    }
+    .response-container {
+      margin-bottom: 36px;
+      line-height: 1.6;
+    }
+    code-block, .code-block {
+      display: block;
+      background: #1e1f20;
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 16px 0;
+      border: 1px solid #3c4043;
+    }
+    .code-block-decoration {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+      background: #282a2c;
+      border-bottom: 1px solid #3c4043;
+      font-size: 12px;
+      color: #9aa0a6;
+      font-family: monospace;
+    }
+    .code-block-decoration-title {
+      font-weight: 600;
+      color: #e3e3e3;
+    }
+    .code-block-decoration-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .code-btn {
+      background: transparent;
+      border: none;
+      color: #9aa0a6;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+    }
+    .code-btn:hover {
+      background: #3c4043;
+      color: #fff;
+    }
+    pre {
+      margin: 0;
+      padding: 16px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: #e3e3e3;
+    }
+    .input-area-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, #131314 30%);
+      padding: 16px 24px 24px 24px;
+      display: flex;
+      justify-content: center;
+      z-index: 100;
+    }
+    .text-input-field {
+      max-width: 768px;
+      width: 100%;
+      background: #1e1f20;
+      border: 1px solid #3c4043;
+      border-radius: 28px;
+      padding: 14px 22px;
+      color: #9aa0a6;
+      font-size: 14px;
+      transition: max-width 0.2s ease, width 0.2s ease;
+    }
+  </style>
+</head>
+<body>
+  <header class="gemini-topbar">
+    <span>✦ Gemini (Simulated Modular WebExtension Environment)</span>
+    <div class="gemini-topbar-controls">
+      <button class="demo-stream-btn" id="btn-simulate-stream">
+        <span>▶ Simulate Live Streaming Response</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="conversation-container">
+    <div style="display: flex; flex-direction: column;">
+      <div class="user-query-container">
+        Can you diagnose the intermittent left-click actuation failure on my Logitech G Pro mouse and produce a full Org-mode report with task checklist and telemetry measurements?
+      </div>
+    </div>
+
+    <div class="response-container">
+      <p>Here is the complete diagnostic assessment in Org-mode:</p>
+
+      <code-block id="sample-block-1">
+        <div class="code-block-decoration">
+          <span class="code-block-decoration-title">org</span>
+          <div class="code-block-decoration-actions">
+            <button class="code-btn" title="Copy code">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            </button>
+          </div>
+        </div>
+        <pre><code>#+TITLE: Hardware Diagnostics: Omron D2FC-F-7N Microswitch Analysis
+#+AUTHOR: Antigravity Lab & chrstfer
+#+DATE: [2026-08-30 Sun 14:30]
+#+OPTIONS: toc:nil
+
+* Mouse Left-Click Intermittent Actuation Failure :DIAGNOSTICS:HARDWARE:
+  :PROPERTIES:
+  :DEVICE: Logitech G Pro Wireless
+  :SWITCH_MODEL: Omron D2FC-F-7N (20M)
+  :VOLTAGE: 3.3V Logic
+  :STATUS: CONFIRMED_DEGRADATION
+  :END:
+
+** Diagnostic Overview
+Given that other HID inputs (keyboard shortcuts, alternate mouse buttons) perform normally, the failure profile points directly to *mechanical leaf spring fatigue* causing high contact resistance and contact bounce.
+
+** Action Item Checklist [1/3]
+- [X] Log raw kernel evdev events to capture bounce spikes
+- [ ] Reflow solder pads with 63/37 leaded alloy
+- [ ] Replace Omron switches with Kailh GM 8.0 or TTC Gold
+
+** Diagnostic Measurement Telemetry
+| Test Case | Signal Level | Bounce Duration | Current Spec | Status | Notes |
+|-----------+--------------+-----------------+--------------+--------+-------|
+| Primary Click | 3.3V Logic | 4.8ms | < 5.0ms | PASS | Within nominal spec |
+| Sustained Drag | 3.3V Logic | Intermittent | 0.0ms Dropouts | FAIL | Micro-bounce under load |
+| Rapid Double Click | 3.3V Logic | 12.2ms | < 8.0ms | WARN | Elevated debounce window |
+
+** Recommended Action Plan
+#+BEGIN_SRC bash
+# 1. Capture raw hardware input events with microsecond timestamps
+sudo evtest /dev/input/by-id/usb-Logitech_G_Pro-event-mouse
+#+END_SRC
+
+*** Component Specifications & Pinout
+- Switch Force :: 65±15gf operating force
+- Pin Pitch :: 5.08mm standard PCB through-hole
+- Rated Lifespan :: 20,000,000 cycles (degrades at ~1.5M in high-humidity)</code></pre>
+      </code-block>
+
+      <p>Let me know if you need replacement part datasheets or solder station temperature profiles.</p>
+    </div>
+  </main>
+
+  <div class="input-area-container">
+    <div class="text-input-field">
+      Ask Gemini...
+    </div>
+  </div>
+
+  <script src="dist/content.js"></script>
+  <script>
+    // Live streaming simulation script
+    const streamBtn = document.getElementById('btn-simulate-stream');
+    const sampleBlock = document.getElementById('sample-block-1');
+    const codeEl = sampleBlock.querySelector('code');
+
+    const fullContent = codeEl.innerText;
+
+    streamBtn.addEventListener('click', () => {
+      codeEl.innerText = '';
+      let index = 0;
+      streamBtn.disabled = true;
+      streamBtn.textContent = 'Streaming...';
+
+      const interval = setInterval(() => {
+        index += 24;
+        if (index >= fullContent.length) {
+          codeEl.innerText = fullContent;
+          clearInterval(interval);
+          streamBtn.disabled = false;
+          streamBtn.textContent = '▶ Simulate Live Streaming Response';
+        } else {
+          codeEl.innerText = fullContent.slice(0, index);
+        }
+      }, 40);
+    });
+  </script>
+</body>
+</html>

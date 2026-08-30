@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Gemini Org & Full-Width UI Mod",
+  "version": "1.0.0",
+  "description": "High-density full-width layout and custom Org-mode rendering for Google Gemini",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "gemini-org-mod@local",
+      "strict_min_version": "109.0"
+    }
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://gemini.google.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://gemini.google.com/*"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ]
+}

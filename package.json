@@ -1,0 +1,20 @@
+{
+  "name": "gemini-org-fullwidth",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch",
+    "package": "node build.mjs && web-ext build --source-dir dist --overwrite-dest",
+    "test": "node --import tsx --test tests/**/*.test.ts",
+    "lint": "npx web-ext lint --source-dir dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "web-ext": "^10.0.0"
+  }
+}
