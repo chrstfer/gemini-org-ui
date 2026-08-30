@@ -2,6 +2,7 @@
  * Org-Mode Drawer (:PROPERTIES:, :LOGBOOK:) Component
  */
 
+import { Fragment, h } from "preact";
 import { OrgDrawerNode } from "../types/ast.ts";
 import { InlineText } from "./InlineText.tsx";
 

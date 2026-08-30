@@ -2,6 +2,7 @@
  * Collapsible Org-Mode Outline Section Component
  */
 
+import { h } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { OrgContentNode, OrgSectionNode } from "../types/ast.ts";
 import { Drawer } from "./Drawer.tsx";

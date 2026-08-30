@@ -63,6 +63,7 @@ div[class*="sidebar"] {
 }
 
 /* Response message bodies expand cleanly */
+body.orgmod-fullwidth-active response-element,
 body.orgmod-fullwidth-active message-content,
 body.orgmod-fullwidth-active .response-container,
 body.orgmod-fullwidth-active .response-container-content,

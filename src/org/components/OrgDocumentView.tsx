@@ -2,6 +2,7 @@
  * Top-Level Org Document View Component
  */
 
+import { h } from "preact";
 import { OrgContentNode, OrgDocument } from "../types/ast.ts";
 import { Drawer } from "./Drawer.tsx";
 import { InlineText } from "./InlineText.tsx";

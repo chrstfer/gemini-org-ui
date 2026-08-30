@@ -28,8 +28,15 @@ export class CodeBlockManager {
             blockEl.querySelector<HTMLElement>("header") ||
             blockEl.querySelector<HTMLElement>(".header-content");
 
-        if (!header && blockEl.parentElement?.classList.contains("code-block-wrapper")) {
-            header = blockEl.parentElement.querySelector<HTMLElement>(".code-block-decoration");
+        if (!header) {
+            const container = blockEl.closest<HTMLElement>(
+                'code-block, .code-block, .formatted-code-block-internal-container, .animated-opacity, .code-block-wrapper, response-element',
+            );
+            if (container && container !== blockEl) {
+                header = container.querySelector<HTMLElement>(
+                    ".code-block-decoration, .code-block-decoration-header, header, .header-content",
+                );
+            }
         }
 
         return header;

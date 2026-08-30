@@ -2,6 +2,7 @@
  * Hierarchical List Item Component with Tri-State [ ], [-], [X] Checkbox Logic
  */
 
+import { h } from "preact";
 import { useState } from "preact/hooks";
 import { OrgCheckboxState, OrgListItemNode } from "../types/ast.ts";
 import { InlineText } from "./InlineText.tsx";

@@ -2,6 +2,7 @@
  * Org-Mode Table Component
  */
 
+import { h } from "preact";
 import { OrgTableNode } from "../types/ast.ts";
 import { InlineText } from "./InlineText.tsx";
 

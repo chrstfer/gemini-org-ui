@@ -2,6 +2,7 @@
  * KaTeX LaTeX Math Component
  */
 
+import { h } from "preact";
 import { renderLatexToString } from "../parser/latex.ts";
 
 interface LatexProps {

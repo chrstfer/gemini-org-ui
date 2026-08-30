@@ -20,8 +20,9 @@
   },
   "compilerOptions": {
     "lib": ["deno.window", "dom", "dom.iterable"],
-    "jsx": "react-jsx",
-    "jsxImportSource": "preact"
+    "jsx": "react",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment"
   },
   "lint": {
     "include": ["src/", "tests/", "build.ts"],

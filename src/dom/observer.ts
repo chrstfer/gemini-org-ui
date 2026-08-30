@@ -23,8 +23,10 @@ export class DomObserver {
 
         // Strict top-level selectors only (avoid wildcards matching child decorations)
         const selectors = [
+            "response-element code-block",
             "code-block",
             ".code-block",
+            ".formatted-code-block-internal-container",
             ".formatted-code",
             "pre",
         ];
@@ -32,17 +34,12 @@ export class DomObserver {
         const candidateBlocks = targetRoot.querySelectorAll<HTMLElement>(selectors.join(", "));
         candidateBlocks.forEach((el) => {
             // 1. Skip if element is a child of a code-block container already being processed
-            if (
-                el.tagName === "PRE" &&
-                el.closest('code-block, .code-block, .formatted-code, [data-gemini-org="root"]') !== el
-            ) {
-                const parentBlock = el.closest<HTMLElement>(
-                    'code-block, .code-block, .formatted-code, [data-gemini-org="root"]',
-                );
-                if (parentBlock) {
-                    this.manager.process(parentBlock);
-                    return;
-                }
+            const parentBlock = el.closest<HTMLElement>(
+                'code-block, .code-block, .formatted-code-block-internal-container, [data-gemini-org="root"]',
+            );
+            if (parentBlock && parentBlock !== el) {
+                this.manager.process(parentBlock);
+                return;
             }
 
             // 2. Skip if element is an internal decoration, toolbar, or rendered view

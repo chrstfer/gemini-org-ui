@@ -3,6 +3,7 @@
  * Renders bold, italic, underline, strike, code, verbatim, math, non-href links, timestamps.
  */
 
+import { Fragment, h } from "preact";
 import { tokenizeInline } from "../parser/inline-lexer.ts";
 import { Latex } from "./Latex.tsx";
 

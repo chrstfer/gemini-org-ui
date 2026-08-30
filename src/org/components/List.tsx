@@ -2,6 +2,7 @@
  * Org-Mode List Component
  */
 
+import { h } from "preact";
 import { OrgListNode } from "../types/ast.ts";
 import { ListItem } from "./ListItem.tsx";
 

@@ -2,6 +2,7 @@
  * Collapsible Org Source Block & Results Component
  */
 
+import { h } from "preact";
 import { useState } from "preact/hooks";
 import { OrgSrcBlockNode } from "../types/ast.ts";
 

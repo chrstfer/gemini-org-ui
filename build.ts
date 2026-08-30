@@ -33,6 +33,11 @@ const importMapUrl = new URL("./deno.json", import.meta.url).href;
 
 const result = await bundle(entryUrl, {
     importMap: importMapUrl,
+    compilerOptions: {
+        jsx: "react",
+        jsxFactory: "h",
+        jsxFragmentFactory: "Fragment",
+    },
 });
 const { code } = result;
 
