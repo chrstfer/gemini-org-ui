@@ -376,6 +376,7 @@ div[class*="code-block-decoration"],
     font-family: var(--orgmod-font-body);
     font-size: 13.5px;
     line-height: 1.5;
+    white-space: normal;
     box-sizing: border-box;
     overflow-x: auto;
 }

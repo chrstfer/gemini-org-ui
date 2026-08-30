@@ -1,5 +1,6 @@
 /**
  * Semantic HTML Renderer for Org-Mode AST
+ * Produces clean, compact HTML without extraneous whitespace/newlines
  */
 
 import {
@@ -19,13 +20,13 @@ export function renderContentNode(node: OrgContentNode): string {
     switch (node.type) {
         case "paragraph":
             if (!node.text.trim()) return "";
-            return `<p class="org-paragraph" data-gemini-org="paragraph">${parseInline(node.text)}</p>\n`;
+            return `<p class="org-paragraph" data-gemini-org="paragraph">${parseInline(node.text)}</p>`;
 
         case "blank_line":
-            return '<div class="org-blank-line" data-gemini-org="blank-line"></div>\n';
+            return '<div class="org-blank-line" data-gemini-org="blank-line"></div>';
 
         case "horizontal_rule":
-            return '<hr class="org-hr" data-gemini-org="hr"/>\n';
+            return '<hr class="org-hr" data-gemini-org="hr"/>';
 
         case "src_block":
             return renderSrcBlock(node);
@@ -49,46 +50,38 @@ function renderSrcBlock(node: OrgSrcBlockNode): string {
 
     if (node.blockType === "src") {
         const langLabel = node.lang ? escapeHtml(node.lang.toUpperCase()) : "CODE";
-        return `
-      <div class="org-src-block" data-gemini-org="src-block">
-        <div class="org-src-header" data-gemini-org="src-header">
-          <span class="org-src-lang" data-gemini-org="src-lang">${langLabel}</span>
-          <button type="button" class="org-src-copy-btn" data-gemini-org="src-copy-btn" title="Copy source block">Copy</button>
-        </div>
-        <pre class="org-src-pre" data-gemini-org="src-pre"><code>${codeContent}</code></pre>
-      </div>\n`;
+        return `<div class="org-src-block" data-gemini-org="src-block"><div class="org-src-header" data-gemini-org="src-header"><span class="org-src-lang" data-gemini-org="src-lang">${langLabel}</span><button type="button" class="org-src-copy-btn" data-gemini-org="src-copy-btn" title="Copy source block">Copy</button></div><pre class="org-src-pre" data-gemini-org="src-pre"><code>${codeContent}</code></pre></div>`;
     }
 
     if (node.blockType === "example") {
-        return `<div class="org-example-block" data-gemini-org="example-block"><pre><code>${codeContent}</code></pre></div>\n`;
+        return `<div class="org-example-block" data-gemini-org="example-block"><pre class="org-example-pre"><code>${codeContent}</code></pre></div>`;
     }
 
     if (node.blockType === "quote") {
         return `<blockquote class="org-quote" data-gemini-org="quote-block">${
             node.content.map((l) => parseInline(l)).join("<br/>")
-        }</blockquote>\n`;
+        }</blockquote>`;
     }
 
     if (node.blockType === "verse") {
         return `<div class="org-verse" data-gemini-org="verse-block">${
             node.content.map((l) => parseInline(l)).join("<br/>")
-        }</div>\n`;
+        }</div>`;
     }
 
     if (node.blockType === "center") {
         return `<div class="org-center" data-gemini-org="center-block">${
             node.content.map((l) => parseInline(l)).join("<br/>")
-        }</div>\n`;
+        }</div>`;
     }
 
     return "";
 }
 
 function renderDrawer(node: OrgDrawerNode): string {
-    let out =
-        `<details class="org-drawer" data-gemini-org="drawer" open><summary class="org-drawer-summary"><span class="org-drawer-tag">:${
-            escapeHtml(node.name)
-        }:</span></summary><div class="org-drawer-body"><table class="org-drawer-table">`;
+    let out = `<details class="org-drawer" data-gemini-org="drawer" open><summary class="org-drawer-summary"><span class="org-drawer-tag">:${
+        escapeHtml(node.name)
+    }:</span></summary><div class="org-drawer-body"><table class="org-drawer-table"><tbody>`;
     for (const entry of node.entries) {
         if (entry.type === "kv" && entry.key) {
             out += `<tr><td class="org-prop-key">:${escapeHtml(entry.key)}:</td><td class="org-prop-val">${
@@ -98,13 +91,12 @@ function renderDrawer(node: OrgDrawerNode): string {
             out += `<tr><td colspan="2" class="org-prop-raw">${parseInline(entry.raw)}</td></tr>`;
         }
     }
-    out += `</table></div></details>\n`;
+    out += `</tbody></table></div></details>`;
     return out;
 }
 
 function renderTable(node: OrgTableNode): string {
-    let out =
-        '<div class="org-table-wrapper" data-gemini-org="table-wrapper"><table class="org-table" data-gemini-org="table"><tbody>';
+    let out = '<div class="org-table-wrapper" data-gemini-org="table-wrapper"><table class="org-table" data-gemini-org="table"><tbody>';
     let isFirstRow = true;
 
     for (let r = 0; r < node.rows.length; r++) {
@@ -127,38 +119,34 @@ function renderTable(node: OrgTableNode): string {
         isFirstRow = false;
     }
 
-    out += "</tbody></table></div>\n";
+    out += "</tbody></table></div>";
     return out;
 }
 
 function renderList(node: OrgListNode): string {
     const tag = node.isOrdered ? "ol" : "ul";
-    let out = `<${tag} class="org-list" data-gemini-org="list" data-indent="${node.indent}">\n`;
+    let out = `<${tag} class="org-list" data-gemini-org="list" data-indent="${node.indent}">`;
 
     for (const item of node.items) {
         if (item.checkbox !== "none") {
             globalCheckboxCounter++;
             const isChecked = item.checkbox === "checked";
             const isPartial = item.checkbox === "partial";
-            out += `  <li class="org-list-item org-checkbox-item" data-gemini-org="checkbox-item">
-    <input type="checkbox" class="org-checkbox" data-gemini-org="checkbox" id="org-cb-${globalCheckboxCounter}" ${
+            out += `<li class="org-list-item org-checkbox-item" data-gemini-org="checkbox-item"><input type="checkbox" class="org-checkbox" data-gemini-org="checkbox" id="org-cb-${globalCheckboxCounter}" ${
                 isChecked ? "checked" : ""
-            } ${isPartial ? 'data-indeterminate="true"' : ""} data-cb-id="${globalCheckboxCounter}">
-    <label for="org-cb-${globalCheckboxCounter}" class="org-checkbox-label ${isChecked ? "org-checked" : ""}">${
-                parseInline(item.text)
-            }</label>
-  </li>\n`;
+            } ${isPartial ? 'data-indeterminate="true"' : ""} data-cb-id="${globalCheckboxCounter}"><label for="org-cb-${globalCheckboxCounter}" class="org-checkbox-label ${
+                isChecked ? "org-checked" : ""
+            }">${parseInline(item.text)}</label></li>`;
         } else if (item.term) {
-            out +=
-                `  <li class="org-list-item org-desc-item" data-gemini-org="desc-item"><strong class="org-desc-term">${
-                    parseInline(item.term)
-                }</strong>: <span class="org-desc-def">${parseInline(item.text)}</span></li>\n`;
+            out += `<li class="org-list-item org-desc-item" data-gemini-org="desc-item"><strong class="org-desc-term">${
+                parseInline(item.term)
+            }</strong>: <span class="org-desc-def">${parseInline(item.text)}</span></li>`;
         } else {
-            out += `  <li class="org-list-item" data-gemini-org="list-item">${parseInline(item.text)}</li>\n`;
+            out += `<li class="org-list-item" data-gemini-org="list-item">${parseInline(item.text)}</li>`;
         }
     }
 
-    out += `</${tag}>\n`;
+    out += `</${tag}>`;
     return out;
 }
 
@@ -175,8 +163,7 @@ export function renderSection(section: OrgSectionNode): string {
 
     let statusHtml = "";
     if (heading.status) {
-        statusHtml =
-            `<span class="org-status org-status-${heading.status}" data-gemini-org="status">${heading.status}</span>`;
+        statusHtml = `<span class="org-status org-status-${heading.status}" data-gemini-org="status">${heading.status}</span>`;
     }
 
     let priorityHtml = "";
@@ -203,20 +190,9 @@ export function renderSection(section: OrgSectionNode): string {
         childrenHtml += renderSection(child);
     }
 
-    return `
-    <div class="org-section org-sec-${level}" data-gemini-org="section" data-level="${level}">
-      <div class="org-heading org-h${level}" data-gemini-org="heading" data-level="${level}">
-        <button type="button" class="org-fold-btn" data-gemini-org="fold-btn" aria-label="Toggle section"><span class="org-fold-icon">▼</span></button>
-        <span class="org-heading-title" data-gemini-org="heading-title">${statusHtml}${priorityHtml}${statsHtml}${
+    return `<div class="org-section org-sec-${level}" data-gemini-org="section" data-level="${level}"><div class="org-heading org-h${level}" data-gemini-org="heading" data-level="${level}"><button type="button" class="org-fold-btn" data-gemini-org="fold-btn" aria-label="Toggle section"><span class="org-fold-icon">▼</span></button><span class="org-heading-title" data-gemini-org="heading-title">${statusHtml}${priorityHtml}${statsHtml}${
         parseInline(heading.title)
-    }</span>
-        ${tagsHtml}
-      </div>
-      <div class="org-section-content" data-gemini-org="section-content" data-level="${level}">
-        ${bodyHtml}
-        ${childrenHtml}
-      </div>
-    </div>\n`;
+    }</span>${tagsHtml}</div><div class="org-section-content" data-gemini-org="section-content" data-level="${level}">${bodyHtml}${childrenHtml}</div></div>`;
 }
 
 export function renderDocument(doc: OrgDocument): string {
@@ -228,7 +204,7 @@ export function renderDocument(doc: OrgDocument): string {
                 escapeHtml(m.key)
             }:</span> <span class="org-meta-val">${parseInline(m.val)}</span></div>`;
         }
-        metaHtml += "</div>\n";
+        metaHtml += "</div>";
     }
 
     let preambleHtml = "";
