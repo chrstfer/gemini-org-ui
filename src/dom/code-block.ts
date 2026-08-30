@@ -1,12 +1,11 @@
 /**
- * Code Block Lifecycle and Streaming Controller
+ * Code Block Lifecycle and Streaming Controller for Gemini UI
  */
 
-import { OrgParser } from "../parser/index.ts";
+import { isOrgContent, renderOrgToDOM } from "../org/index.ts";
 import { SettingsStore } from "../storage/settings-store.ts";
 import { CodeBlockRecord } from "../types/dom.ts";
 import { createCodeBlockToolbar } from "../ui/toolbar.ts";
-import { setupInteractiveListeners } from "./interactive.ts";
 
 export class CodeBlockManager {
     private registry = new Map<string, CodeBlockRecord>();
@@ -82,12 +81,10 @@ export class CodeBlockManager {
                 }
 
                 if (record.isRendered) {
-                    record.renderedEl.innerHTML = OrgParser.render(currentText);
-                    setupInteractiveListeners(record.renderedEl);
-                } else if (this.store.settings.autoRenderOrg && OrgParser.isOrgContent(currentText)) {
+                    renderOrgToDOM(currentText, record.renderedEl, record.allFolded);
+                } else if (this.store.settings.autoRenderOrg && isOrgContent(currentText)) {
                     // Dynamically activate Org rendering when streaming content satisfies detector threshold
-                    record.renderedEl.innerHTML = OrgParser.render(currentText);
-                    setupInteractiveListeners(record.renderedEl);
+                    renderOrgToDOM(currentText, record.renderedEl, false);
                     record.isRendered = true;
                     record.preEl.style.display = "none";
                     record.renderedEl.style.display = "block";
@@ -114,7 +111,7 @@ export class CodeBlockManager {
         if (!currentText.trim()) return;
 
         // Check if this block contains Org syntax or explicit language label
-        const isOrg = OrgParser.isOrgContent(currentText);
+        const isOrg = isOrgContent(currentText);
         const headerTitle = blockEl.querySelector(".code-block-decoration-title, .language-label")?.textContent || "";
         const hasOrgTag = /\b(?:org|org-mode|orgmode)\b/i.test(headerTitle);
 
@@ -188,8 +185,7 @@ export class CodeBlockManager {
             if (record.isRendered) {
                 const text = this.getBlockText(codeEl);
                 record.lastText = text;
-                renderedView.innerHTML = OrgParser.render(text);
-                setupInteractiveListeners(renderedView);
+                renderOrgToDOM(text, renderedView, record.allFolded);
 
                 preEl.style.display = "none";
                 renderedView.style.display = "block";
@@ -218,8 +214,7 @@ export class CodeBlockManager {
         foldAllBtn.addEventListener("click", (e) => {
             e.stopPropagation();
             record.allFolded = !record.allFolded;
-            const sections = renderedView.querySelectorAll<HTMLElement>('.org-section, [data-gemini-org="section"]');
-            sections.forEach((sec) => sec.classList.toggle("org-folded", record.allFolded));
+            renderOrgToDOM(record.lastText, renderedView, record.allFolded);
             const span = foldAllBtn.querySelector("span");
             if (span) span.textContent = record.allFolded ? "Expand All" : "Fold All";
         });

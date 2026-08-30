@@ -458,10 +458,6 @@ div[class*="code-block-decoration"],
     transform: rotate(-90deg);
 }
 
-.org-section.org-folded > .org-section-content {
-    display: none !important;
-}
-
 .org-section-content {
     padding-left: 10px;
     border-left: 1px solid var(--orgmod-border-subtle);
@@ -768,20 +764,32 @@ div[class*="code-block-decoration"],
     background: rgba(255, 255, 255, 0.025);
 }
 
-/* Interactive Checkboxes & Lists */
+/* Interactive Checkboxes & Hierarchical Lists */
 .org-list {
     margin: 3px 0;
     padding-left: 18px;
 }
 
+.org-nested-list {
+    margin: 2px 0 2px 12px;
+    padding-left: 14px;
+    border-left: 1px dashed var(--orgmod-border-subtle);
+}
+
 .org-list-item {
-    margin: 1px 0;
+    margin: 2px 0;
 }
 
 .org-checkbox-item {
     list-style: none;
     margin-left: -16px;
     display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.org-list-item-content {
+    display: inline-flex;
     align-items: baseline;
     gap: 6px;
 }
@@ -799,6 +807,7 @@ div[class*="code-block-decoration"],
     position: relative;
     flex-shrink: 0;
     top: 2px;
+    margin-right: 4px;
 }
 
 .org-checkbox:checked {
@@ -816,12 +825,14 @@ div[class*="code-block-decoration"],
     color: #121316;
 }
 
-.org-checkbox[data-indeterminate="true"] {
+.org-checkbox[data-indeterminate="true"],
+.org-checkbox:indeterminate {
     background: #fdd663;
     border-color: #fdd663;
 }
 
-.org-checkbox[data-indeterminate="true"]::after {
+.org-checkbox[data-indeterminate="true"]::after,
+.org-checkbox:indeterminate::after {
     content: '−';
     position: absolute;
     top: -5px;
@@ -845,14 +856,18 @@ div[class*="code-block-decoration"],
     color: var(--orgmod-accent);
 }
 
-/* Source & Example Blocks */
+/* Collapsible Source & Results Blocks */
+.org-src-container {
+    margin: 6px 0;
+}
+
 .org-src-block {
     background: #0d0e10;
     border: 1px solid var(--orgmod-border-color);
     border-left: 3px solid #fdd663;
     border-radius: 4px;
-    margin: 6px 0;
-    padding: 6px 10px;
+    margin: 4px 0;
+    padding: 0;
     overflow: hidden;
 }
 
@@ -860,15 +875,33 @@ div[class*="code-block-decoration"],
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 4px;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
     font-family: var(--orgmod-font-mono);
     font-size: 10.5px;
+    user-select: none;
+}
+
+.org-src-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .org-src-lang {
     color: #fdd663;
     font-weight: 700;
     text-transform: uppercase;
+}
+
+.org-src-name {
+    color: #8ab4f8;
+}
+
+.org-src-params {
+    color: var(--orgmod-text-dim);
+    font-size: 9.5px;
 }
 
 .org-src-copy-btn {
@@ -895,9 +928,10 @@ div[class*="code-block-decoration"],
 }
 
 .org-src-pre,
-.org-example-block pre {
+.org-example-pre,
+.org-results-pre {
     margin: 0;
-    padding: 0;
+    padding: 6px 10px;
     background: transparent;
     font-family: var(--orgmod-font-mono);
     font-size: 12.5px;
@@ -906,12 +940,77 @@ div[class*="code-block-decoration"],
     overflow-x: auto;
 }
 
+/* Collapsible Results Block */
+.org-results-block {
+    background: #101214;
+    border: 1px solid var(--orgmod-border-subtle);
+    border-left: 3px solid #81c995;
+    border-radius: 4px;
+    margin: 4px 0 6px 12px;
+    overflow: hidden;
+}
+
+.org-results-summary {
+    padding: 3px 8px;
+    background: rgba(255, 255, 255, 0.02);
+    cursor: pointer;
+    font-family: var(--orgmod-font-mono);
+    font-size: 10px;
+    user-select: none;
+}
+
+.org-results-tag {
+    color: #81c995;
+    font-weight: 700;
+}
+
 .org-example-block {
     background: #101113;
     border: 1px solid var(--orgmod-border-subtle);
     border-radius: 4px;
-    padding: 8px 12px;
     margin: 6px 0;
+    overflow: hidden;
+}
+
+.org-example-summary {
+    padding: 3px 8px;
+    cursor: pointer;
+    font-family: var(--orgmod-font-mono);
+    font-size: 10px;
+    color: var(--orgmod-text-muted);
+}
+
+/* LaTeX Math Blocks & Inlines */
+.org-latex-block {
+    margin: 8px 0;
+    overflow-x: auto;
+    text-align: center;
+}
+
+.org-latex-display {
+    display: block;
+    margin: 6px 0;
+}
+
+.org-latex-inline {
+    display: inline;
+    padding: 0 2px;
+}
+
+/* Non-href Link Badges */
+.org-link-badge {
+    background: rgba(138, 180, 248, 0.12);
+    color: var(--orgmod-link-fg);
+    border-radius: 3px;
+    padding: 1px 4px;
+    font-weight: 500;
+    border-bottom: 1px dashed var(--orgmod-accent);
+}
+
+.org-footnote-badge {
+    color: var(--orgmod-accent);
+    font-size: 0.85em;
+    font-family: var(--orgmod-font-mono);
 }
 
 /* Quotes, Verse, Center */
@@ -980,20 +1079,4 @@ div[class*="code-block-decoration"],
 .org-strike {
     text-decoration: line-through;
     color: var(--orgmod-text-dim);
-}
-
-.org-link {
-    color: var(--orgmod-link-fg);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-}
-
-.org-link:hover {
-    color: #adc8ff;
-}
-
-.org-footnote-ref a {
-    color: var(--orgmod-accent);
-    font-size: 0.8em;
-    text-decoration: none;
 }

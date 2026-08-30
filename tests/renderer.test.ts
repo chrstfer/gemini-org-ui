@@ -1,96 +1,79 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { OrgParser } from "../src/parser/index.ts";
+import { parseOrgDocument, renderLatexToString } from "../src/org/index.ts";
 
-describe("renderer", () => {
-    it("renders complete document with metadata banner, tags, status, and subtrees", () => {
-        const doc = `#+TITLE: Diagnostic Suite
-#+AUTHOR: Antigravity
+describe("renderer and latex", () => {
+    it("renders LaTeX math to KaTeX HTML without errors", () => {
+        const math = "E = mc^2";
+        const html = renderLatexToString(math, false);
+        assert.ok(html.includes("katex"));
+        assert.ok(html.includes("E"));
+        assert.ok(html.includes("m"));
+        assert.ok(html.includes("c"));
 
-* TODO [#A] Urgent fix for switch bouncing :HARDWARE:URGENT:
-Details about the fix.
-** Subtask 1
-- [ ] Measure bounce
-- [X] Inspect trace
-*** Deep Note
-Deep subtask info.
-* DONE Task 2
-All set.`;
-
-        const html = OrgParser.render(doc);
-
-        // Metadata banner
-        assert.ok(html.includes("org-meta-banner"));
-        assert.ok(html.includes("#+TITLE:"));
-        assert.ok(html.includes("Diagnostic Suite"));
-        assert.ok(html.includes("#+AUTHOR:"));
-        assert.ok(html.includes("Antigravity"));
-
-        // Status & Priority & Tags
-        assert.ok(html.includes("org-status-TODO"));
-        assert.ok(html.includes("org-priority-A"));
-        assert.ok(html.includes(":HARDWARE:"));
-        assert.ok(html.includes(":URGENT:"));
-
-        // Hierarchy levels
-        assert.ok(html.includes("org-sec-1"));
-        assert.ok(html.includes("org-sec-2"));
-        assert.ok(html.includes("org-sec-3"));
-
-        // Interactive Checkboxes
-        assert.ok(html.includes("org-checkbox-item"));
-        assert.ok(html.includes('type="checkbox"'));
-        assert.ok(html.includes("checked"));
-
-        // Verify balanced section open/close tags
-        const openCount = (html.match(/<div class="org-section /g) || []).length;
-        assert.equal(openCount, 4); // Sec 1, Subtask 1, Deep Note, Task 2
+        const displayMath = "\\frac{\\lambda^k e^{-\\lambda}}{k!}";
+        const displayHtml = renderLatexToString(displayMath, true);
+        assert.ok(displayHtml.includes("katex"));
     });
 
-    it("renders property drawers as collapsible details", () => {
-        const doc = `* System Specs
-:PROPERTIES:
-:CPU: AMD Ryzen 9
-:RAM: 64GB
-:END:`;
+    it("parses complex Org document with math, source blocks, tables, and nested tasks", () => {
+        const doc = `#+TITLE: Performance Analysis
+#+AUTHOR: Systems
 
-        const html = OrgParser.render(doc);
-        assert.ok(html.includes('class="org-drawer"'));
-        assert.ok(html.includes('data-gemini-org="drawer"'));
-        assert.ok(html.includes(":PROPERTIES:"));
-        assert.ok(html.includes(":CPU:"));
-        assert.ok(html.includes("AMD Ryzen 9"));
-        assert.ok(html.includes(":RAM:"));
-        assert.ok(html.includes("64GB"));
-    });
+* Operations :INFRA:
+** Task List
+- [-] Cluster deployment
+  - [X] Step 1: Base images
+  - [ ] Step 2: Mesh topology
+  - [ ] Step 3: Node validation
 
-    it("renders tables with header rows and numeric cell alignment", () => {
-        const doc = `| Metric | Sample | Duration | Pass |
-|--------+--------+----------+------|
-| Jitter | 1000 | 4.2ms | TRUE |
-| Latency | 50 | 12.8ms | TRUE |`;
+#+NAME: latency_calc
+#+BEGIN_SRC python :exports both
+def p99(): return 3.41
+#+END_SRC
 
-        const html = OrgParser.render(doc);
-        assert.ok(html.includes('class="org-table"'));
-        assert.ok(html.includes('data-gemini-org="table"'));
-        assert.ok(html.includes("org-table-header-row"));
-        assert.ok(html.includes('<th class="">Metric</th>'));
-        assert.ok(html.includes('<th class="">Sample</th>'));
-        assert.ok(html.includes('<td class=" org-table-num">1000</td>'));
-        assert.ok(html.includes('<td class=" org-table-num">50</td>'));
-    });
+#+RESULTS: latency_calc
+: 3.41 ms
 
-    it("renders source blocks with language badge and copy snippet button", () => {
-        const doc = `#+BEGIN_SRC python
-def test():
-    return True
-#+END_SRC`;
+** Mathematical Modeling
+\\begin{equation}
+F(x) = 1 - e^{-\\lambda x}
+\\end{equation}`;
 
-        const html = OrgParser.render(doc);
-        assert.ok(html.includes("org-src-block"));
-        assert.ok(html.includes('data-gemini-org="src-block"'));
-        assert.ok(html.includes("PYTHON"));
-        assert.ok(html.includes("org-src-copy-btn"));
-        assert.ok(html.includes("def test():"));
+        const ast = parseOrgDocument(doc);
+        assert.equal(ast.metadata[0].val, "Performance Analysis");
+        assert.equal(ast.sections.length, 1);
+        assert.equal(ast.sections[0].heading.title, "Operations");
+        assert.equal(ast.sections[0].children.length, 2);
+
+        // Section 1 child 0: Task List
+        const taskListSec = ast.sections[0].children[0];
+        const listNode = taskListSec.body.find((n) => n.type === "list");
+        assert.ok(listNode);
+        if (listNode && listNode.type === "list") {
+            assert.equal(listNode.items.length, 1);
+            assert.equal(listNode.items[0].text, "Cluster deployment");
+            assert.equal(listNode.items[0].children.length, 3);
+            assert.equal(listNode.items[0].children[0].checkbox, "checked");
+            assert.equal(listNode.items[0].children[1].checkbox, "unchecked");
+        }
+
+        // Src block with results
+        const srcNode = taskListSec.body.find((n) => n.type === "src_block");
+        assert.ok(srcNode);
+        if (srcNode && srcNode.type === "src_block") {
+            assert.equal(srcNode.name, "latency_calc");
+            assert.ok(srcNode.results);
+            assert.deepEqual(srcNode.results?.content, ["3.41 ms"]);
+        }
+
+        // Section 1 child 1: Mathematical Modeling with LaTeX
+        const mathSec = ast.sections[0].children[1];
+        const latexNode = mathSec.body.find((n) => n.type === "latex_block");
+        assert.ok(latexNode);
+        if (latexNode && latexNode.type === "latex_block") {
+            assert.equal(latexNode.environment, "equation");
+            assert.ok(latexNode.content.includes("1 - e^{-\\lambda x}"));
+        }
     });
 });

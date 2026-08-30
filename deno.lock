@@ -4,6 +4,7 @@
     "jsr:@deno/cache-dir@0.13.2": "0.13.2",
     "jsr:@deno/emit@*": "0.46.0",
     "jsr:@deno/emit@0.46": "0.46.0",
+    "jsr:@deno/graph@~0.73.1": "0.73.1",
     "jsr:@std/assert@*": "1.0.19",
     "jsr:@std/assert@0.223": "0.223.0",
     "jsr:@std/assert@^1.0.19": "1.0.19",
@@ -22,6 +23,7 @@
     "@deno/cache-dir@0.13.2": {
       "integrity": "c22419dfe27ab85f345bee487aaaadba498b005cce3644e9d2528db035c5454d",
       "dependencies": [
+        "jsr:@deno/graph",
         "jsr:@std/fmt",
         "jsr:@std/fs",
         "jsr:@std/io",
@@ -34,6 +36,9 @@
         "jsr:@deno/cache-dir",
         "jsr:@std/path"
       ]
+    },
+    "@deno/graph@0.73.1": {
+      "integrity": "cd69639d2709d479037d5ce191a422eabe8d71bb68b0098344f6b07411c84d41"
     },
     "@std/assert@0.223.0": {
       "integrity": "eb8d6d879d76e1cc431205bd346ed4d88dc051c6366365b1af47034b0670be24"
@@ -737,6 +742,9 @@
     "commander@12.1.0": {
       "integrity": "sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA=="
     },
+    "commander@8.3.0": {
+      "integrity": "sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww=="
+    },
     "commander@9.5.0": {
       "integrity": "sha512-KRs7WVDKg86PWiuAqhDrAQnTXZKraVcCc6vFdL14qrZ/DcWwuRo7VoiYXalXO7S5GKpqYiVEwCbgFDfxNHKJBQ=="
     },
@@ -1389,6 +1397,13 @@
         "safe-buffer"
       ]
     },
+    "katex@0.16.47": {
+      "integrity": "sha512-Eeo8Ys1doU1z+x8AZsPpQu+p/QcZBI5PeOo7QGQdy2x2m0MU/hYagBbGOmXwr5KVbEfVuWv9LpnQWeehogurjg==",
+      "dependencies": [
+        "commander@8.3.0"
+      ],
+      "bin": true
+    },
     "keyv@4.5.4": {
       "integrity": "sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==",
       "dependencies": [
@@ -1618,6 +1633,9 @@
     },
     "powershell-utils@0.1.0": {
       "integrity": "sha512-dM0jVuXJPsDN6DvRpea484tCUaMiXWjuCn++HGTqUWzGDjv5tZkEZldAJ/UMlqRYGFrD/etByo4/xOuC/snX2A=="
+    },
+    "preact@10.29.8": {
+      "integrity": "sha512-ej2aVZ+vZ8WO7tvlQWRM9N63A0KzF9q4mWJfDUHgYaIofWY9hu74QdnQrjoPMmZi2/nZ5gN0bJCQF49xQqx09Q=="
     },
     "prelude-ls@1.2.1": {
       "integrity": "sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g=="
@@ -2061,6 +2079,16 @@
         "jszip"
       ]
     }
+  },
+  "remote": {
+    "https://esm.sh/katex@0.16.21": "9fa04bc7144b202550466cc47f5d77d03fbeba51f9e375c1758e63c3e328256a",
+    "https://esm.sh/katex@0.16.21/denonext/katex.mjs": "daa0d2653aebdf1289d3007abbb65a1b230f25cb71a5c9903371275aab104306",
+    "https://esm.sh/preact@10.25.4": "5feca65f9f6784aede771380a07be8e3fd694d37c185446889060980f09d2339",
+    "https://esm.sh/preact@10.25.4/denonext/hooks.mjs": "8dcd2ccb25dc7b0b28bca80f1a531dd4c26938bd12c590d8374d3c0ba6b80153",
+    "https://esm.sh/preact@10.25.4/denonext/jsx-runtime.mjs": "97bf9d5b9d413029626ab5d4c4ef2e79448a0c59ab2e4a078686f609968df7ac",
+    "https://esm.sh/preact@10.25.4/denonext/preact.mjs": "dbec066699281922f371202c37e70506b7f436475acbe76b2e9f03ddb1b01a56",
+    "https://esm.sh/preact@10.25.4/hooks": "70f392f6cb4a1622b4d5d9263daf887a21bebbbb39dbd16b45019565617c7dd5",
+    "https://esm.sh/preact@10.25.4/jsx-runtime": "b9feb114168d102397dc3d6b09e00630b9ef61c4fa98316c0b18b4c02996356b"
   },
   "workspace": {
     "dependencies": [

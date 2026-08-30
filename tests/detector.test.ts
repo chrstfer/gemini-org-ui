@@ -1,9 +1,9 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { isOrgContent } from "../src/parser/detector.ts";
+import { isOrgContent } from "../src/org/parser/detector.ts";
 
 describe("isOrgContent", () => {
-    it("detects valid Org mode headlines, drawers, tables, directives", () => {
+    it("detects valid Org mode headlines, drawers, tables, directives, latex", () => {
         const sample1 = `* Project Roadmap :DEV:\n** Subtask\n- [ ] Do something`;
         assert.equal(isOrgContent(sample1), true);
 
@@ -27,6 +27,9 @@ describe("isOrgContent", () => {
 
         const sample8 = `- Item :: Description of the term`;
         assert.equal(isOrgContent(sample8), true);
+
+        const sample9 = `\\begin{equation}\nE = mc^2\n\\end{equation}`;
+        assert.equal(isOrgContent(sample9), true);
     });
 
     it("rejects plain non-Org text and standard code snippets", () => {

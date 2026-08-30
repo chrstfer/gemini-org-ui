@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { parseOrgDocument } from "../src/parser/block-parser.ts";
+import { parseOrgDocument } from "../src/org/parser/block-parser.ts";
 
 describe("block-parser", () => {
     it("builds recursive AST headline tree with proper nesting", () => {
@@ -81,37 +81,62 @@ Next top text`;
         }
     });
 
-    it("parses lists and checkboxes", () => {
-        const text = `- [ ] Open task\n- [X] Completed task\n- [-] Partial task\n- Item :: Term description`;
+    it("parses hierarchical lists and checkboxes", () => {
+        const text = `- [ ] Parent task
+  - [X] Child task 1
+  - [-] Child task 2
+- Item :: Term description`;
         const ast = parseOrgDocument(text);
 
         assert.equal(ast.preamble.length, 1);
         const list = ast.preamble[0];
         assert.equal(list.type, "list");
         if (list.type === "list") {
-            assert.equal(list.items.length, 4);
+            assert.equal(list.items.length, 2);
             assert.equal(list.items[0].checkbox, "unchecked");
-            assert.equal(list.items[1].checkbox, "checked");
-            assert.equal(list.items[2].checkbox, "partial");
-            assert.equal(list.items[3].term, "Item");
-            assert.equal(list.items[3].text, "Term description");
+            assert.equal(list.items[0].children.length, 2);
+            assert.equal(list.items[0].children[0].checkbox, "checked");
+            assert.equal(list.items[0].children[1].checkbox, "partial");
+            assert.equal(list.items[1].term, "Item");
+            assert.equal(list.items[1].text, "Term description");
         }
     });
 
-    it("parses source blocks", () => {
-        const text = `#+BEGIN_SRC bash -n
-sudo evtest /dev/input/mouse0
-#+END_SRC`;
+    it("parses source blocks with #+NAME and #+RESULTS", () => {
+        const text = `#+NAME: latency_calc
+#+BEGIN_SRC python :exports both
+print("Latency: 3.41 ms")
+#+END_SRC
+
+#+RESULTS: latency_calc
+: Latency: 3.41 ms`;
+        const ast = parseOrgDocument(text);
+
+        const src = ast.preamble.find((n) => n.type === "src_block");
+        assert.ok(src);
+        if (src && src.type === "src_block") {
+            assert.equal(src.blockType, "src");
+            assert.equal(src.lang, "python");
+            assert.equal(src.name, "latency_calc");
+            assert.equal(src.params, ":exports both");
+            assert.deepEqual(src.content, ['print("Latency: 3.41 ms")']);
+            assert.ok(src.results);
+            assert.deepEqual(src.results?.content, ["Latency: 3.41 ms"]);
+        }
+    });
+
+    it("parses LaTeX environment blocks", () => {
+        const text = `\\begin{equation}
+F(x; \\lambda) = 1 - e^{-\\lambda x}
+\\end{equation}`;
         const ast = parseOrgDocument(text);
 
         assert.equal(ast.preamble.length, 1);
-        const src = ast.preamble[0];
-        assert.equal(src.type, "src_block");
-        if (src.type === "src_block") {
-            assert.equal(src.blockType, "src");
-            assert.equal(src.lang, "bash");
-            assert.equal(src.params, "-n");
-            assert.deepEqual(src.content, ["sudo evtest /dev/input/mouse0"]);
+        const latex = ast.preamble[0];
+        assert.equal(latex.type, "latex_block");
+        if (latex.type === "latex_block") {
+            assert.equal(latex.environment, "equation");
+            assert.ok(latex.content.includes("1 - e^{-\\lambda x}"));
         }
     });
 });
