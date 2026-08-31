@@ -18,3 +18,18 @@ export function renderLatexToString(latex: string, displayMode = false): string 
         return `<code class="org-latex-error">${latex}</code>`;
     }
 }
+
+export function renderLatexIntoDOM(latex: string, container: HTMLElement, displayMode = false): void {
+    try {
+        container.textContent = "";
+        katex.render(latex.trim(), container, {
+            displayMode,
+            throwOnError: false,
+            output: "htmlAndMathml",
+            strict: false,
+        });
+    } catch (e) {
+        console.warn("[GeminiOrgMod] KaTeX render error:", e);
+        container.textContent = latex;
+    }
+}

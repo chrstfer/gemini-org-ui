@@ -3,7 +3,8 @@
  */
 
 import { h } from "preact";
-import { renderLatexToString } from "../parser/latex.ts";
+import { useEffect, useRef } from "preact/hooks";
+import { renderLatexIntoDOM } from "../parser/latex.ts";
 
 interface LatexProps {
     math: string;
@@ -11,11 +12,18 @@ interface LatexProps {
 }
 
 export function Latex({ math, display = false }: LatexProps) {
-    const html = renderLatexToString(math, display);
+    const elRef = useRef<HTMLSpanElement>(null);
+
+    useEffect(() => {
+        if (elRef.current) {
+            renderLatexIntoDOM(math, elRef.current, display);
+        }
+    }, [math, display]);
+
     return (
         <span
+            ref={elRef}
             className={display ? "org-latex-display" : "org-latex-inline"}
-            dangerouslySetInnerHTML={{ __html: html }}
         />
     );
 }

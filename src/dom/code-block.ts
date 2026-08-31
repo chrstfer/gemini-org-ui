@@ -7,6 +7,23 @@ import { SettingsStore } from "../storage/settings-store.ts";
 import { CodeBlockRecord } from "../types/dom.ts";
 import { createCodeBlockToolbar } from "../ui/toolbar.ts";
 
+export const KNOWN_NON_ORG_LANGUAGES = new Set([
+    "python", "py", "python3", "py3",
+    "javascript", "js", "jsx", "mjs", "cjs",
+    "typescript", "ts", "tsx", "mts", "cts",
+    "c", "cpp", "c++", "cc", "cxx", "h", "hpp", "csharp", "c#", "cs",
+    "java", "rust", "rs", "go", "golang",
+    "ruby", "rb", "php", "swift", "kotlin", "kt", "scala",
+    "html", "htm", "css", "scss", "sass", "less",
+    "sql", "mysql", "pgsql", "postgres", "plsql", "sqlite",
+    "bash", "shell", "sh", "zsh", "fish", "powershell", "ps1", "batch", "bat", "cmd",
+    "json", "json5", "jsonc", "yaml", "yml", "toml", "xml", "svg",
+    "markdown", "md", "latex", "tex",
+    "graphql", "gql", "dockerfile", "docker", "makefile", "make", "cmake",
+    "r", "julia", "jl", "lua", "perl", "pl", "haskell", "hs", "elixir", "ex", "erlang", "erl", "dart",
+    "assembly", "asm", "wasm", "diff", "patch", "vim", "viml", "ini", "env", "proto", "protobuf",
+]);
+
 export class CodeBlockManager {
     private registry = new Map<string, CodeBlockRecord>();
     private blockElements = new WeakMap<HTMLElement, string>();
@@ -40,6 +57,29 @@ export class CodeBlockManager {
         }
 
         return header;
+    }
+
+    private getHeaderLanguage(headerEl: HTMLElement | null): string {
+        if (!headerEl) return "";
+        const span = headerEl.querySelector<HTMLElement>(
+            ".code-block-decoration-title, .language-label, .header-formatted > span:not(.buttons *), :scope > span:not(.buttons *)",
+        );
+        if (span && span.textContent) {
+            return span.textContent.trim().toLowerCase();
+        }
+        for (const child of Array.from(headerEl.childNodes)) {
+            if (child.nodeType === Node.TEXT_NODE && child.textContent?.trim()) {
+                return child.textContent.trim().toLowerCase();
+            }
+            if (
+                child.nodeType === Node.ELEMENT_NODE &&
+                !(child as HTMLElement).classList.contains("buttons") &&
+                (child as HTMLElement).tagName === "SPAN"
+            ) {
+                return ((child as HTMLElement).textContent || "").trim().toLowerCase();
+            }
+        }
+        return "";
     }
 
     getRecord(id: string): CodeBlockRecord | undefined {
@@ -83,7 +123,7 @@ export class CodeBlockManager {
 
                 // When raw content is cleared during streaming restart, clear the rendered view immediately
                 if (!currentText.trim()) {
-                    record.renderedEl.innerHTML = "";
+                    record.renderedEl.textContent = "";
                     return;
                 }
 
@@ -117,12 +157,19 @@ export class CodeBlockManager {
 
         if (!currentText.trim()) return;
 
-        // Check if this block contains Org syntax or explicit language label
-        const isOrg = isOrgContent(currentText);
-        const headerTitle = blockEl.querySelector(".code-block-decoration-title, .language-label")?.textContent || "";
-        const hasOrgTag = /\b(?:org|org-mode|orgmode)\b/i.test(headerTitle);
+        // Check language label and content type
+        const geminiHeader = this.findHeader(blockEl);
+        const headerTitle = this.getHeaderLanguage(geminiHeader);
+        const isExplicitOrg = /\b(?:org|org-mode|orgmode)\b/i.test(headerTitle);
+        const isKnownNonOrg = KNOWN_NON_ORG_LANGUAGES.has(headerTitle);
 
-        if (!isOrg && !hasOrgTag) return;
+        // If the header explicitly identifies a known non-Org programming language, skip completely
+        if (isKnownNonOrg) return;
+
+        // Check if this block contains Org syntax or explicit language label
+        const isOrg = isExplicitOrg || isOrgContent(currentText);
+
+        if (!isOrg) return;
 
         // Assign Unique Block ID
         this.blockIdCounter++;
@@ -147,7 +194,6 @@ export class CodeBlockManager {
         const { container: toolbar, toggleBtn, foldAllBtn } = createCodeBlockToolbar(blockId);
 
         // Attach Toolbar to Gemini's header actions (.buttons) without wrapping or displacing native gem-icon-buttons
-        const geminiHeader = this.findHeader(blockEl);
         if (geminiHeader) {
             const actionsContainer = geminiHeader.querySelector<HTMLElement>(
                 ".buttons, .code-block-decoration-actions, .header-actions",

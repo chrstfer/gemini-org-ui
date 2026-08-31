@@ -3,11 +3,44 @@
  * Identifies Org headlines, drawers, tables, directives, checkboxes, LaTeX blocks.
  */
 
+export function isProgrammingCode(text: string): boolean {
+    const trimmed = text.trim();
+    if (!trimmed) return false;
+
+    const firstLine = trimmed.split("\n")[0].trim();
+    if (firstLine.startsWith("*") || firstLine.startsWith("#+TITLE") || firstLine.startsWith("#+OPTIONS")) {
+        return false;
+    }
+
+    const codePatterns = [
+        /^(?:import\s+[\w{},*\s]+\s+from\s+['"]|from\s+[\w.]+\s+import\s+|import\s+[\w.]+)/m,
+        /^(?:def\s+\w+\s*\(|class\s+\w+[:\(]|async\s+def\s+\w+)/m,
+        /^(?:function\s+\w+\s*\(|const\s+\w+\s*=|let\s+\w+\s*=|var\s+\w+\s*=)/m,
+        /^(?:public\s+|private\s+|protected\s+)?(?:class|interface|enum|struct)\s+\w+/m,
+        /^(?:#include\s+<[\w.]+>|package\s+[\w.]+;|using\s+[\w.]+;)/m,
+        /^(?:if\s+__name__\s*==\s*['"]__main__['"]:)/m,
+        /^(?:fn\s+\w+\s*\(|pub\s+fn\s+\w+)/m,
+        /^(?:package\s+main|func\s+\w+\s*\()/m,
+        /<!DOCTYPE\s+html|<html\b/i,
+    ];
+
+    for (const pattern of codePatterns) {
+        if (pattern.test(trimmed)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 export function isOrgContent(text: string): boolean {
     if (!text || typeof text !== "string") return false;
 
     const trimmed = text.trim();
     if (!trimmed) return false;
+
+    // Disqualify programming code containing embedded Org template strings
+    if (isProgrammingCode(trimmed)) return false;
 
     // Direct strong indicators (1 occurrence is sufficient)
     const strongPatterns = [
