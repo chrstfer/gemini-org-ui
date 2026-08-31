@@ -10,11 +10,5 @@
     "test": "node --import tsx --test tests/**/*.test.ts",
     "lint": "npx web-ext lint --source-dir dist",
     "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "esbuild": "^0.25.0",
-    "tsx": "^4.19.0",
-    "typescript": "^5.7.0",
-    "web-ext": "^10.0.0"
   }
 }
