@@ -1,0 +1,28 @@
+#+TITLE: ADR 0004: KaTeX Math and LaTeX Greek Rendering Pipeline
+#+DATE: 2026-09-03
+
+:PROPERTIES:
+:STATUS: Accepted
+:END:
+
+* Status
+Accepted
+
+* Context
+Scientific and mathematical outputs from Gemini in Org-mode contain LaTeX Greek symbols (e.g. ~\lambda~, ~\sigma~, ~\tau~), inline equations (~$...$~, ~\(...\)~), and centered display equations (~\begin{equation}...\end{equation}~, ~\begin{align}...\end{align}~). We need crisp mathematical typesetting compliant with Content Security Policies (CSP).
+
+* Decision
+We adopt *KaTeX 0.16.x Bundled Rendering*:
+- Inline math expressions and display equation blocks are parsed by the Org block parser into AST ~LatexNode~ and ~InlineText~ tokens.
+- Equations are rendered via KaTeX directly to HTML/MathML within the Preact component tree.
+- KaTeX stylesheet and font assets are bundled locally in the extension bundle, with zero external network requests to satisfy Firefox and Chromium CSP restrictions.
+- In the event of a KaTeX parse failure, the component gracefully falls back to formatted monospace Org math notation.
+
+* Consequences
+** Positive
+- Instantaneous, high-fidelity mathematical typography matching LaTeX print standards.
+- 100% offline and CSP-compliant execution.
+- Robust fallback for non-standard LaTeX syntax.
+
+** Negative
+- Slight increase in bundled extension asset footprint for KaTeX fonts and CSS.

@@ -1,5 +1,4 @@
 {
-  "unstable": ["sloppy-imports"],
   "imports": {
     "@deno/emit": "jsr:@deno/emit@^0.46.0",
     "@std/assert": "jsr:@std/assert@^1.0.19",
@@ -20,9 +19,8 @@
   },
   "compilerOptions": {
     "lib": ["deno.window", "dom", "dom.iterable"],
-    "jsx": "react",
-    "jsxFactory": "h",
-    "jsxFragmentFactory": "Fragment"
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact"
   },
   "lint": {
     "include": ["src/", "tests/", "build.ts"],

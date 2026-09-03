@@ -26,11 +26,11 @@ export function parseOrgDocument(rawOrg: string): OrgDocument {
     if (!rawOrg || typeof rawOrg !== "string") return doc;
 
     const lines = rawOrg.split("\n");
-    const sectionStack: OrgSectionNode[] = [];
+    const sectionStack: Array<{ section: OrgSectionNode; startLine: number }> = [];
 
     function currentContainer(): OrgContentNode[] {
         if (sectionStack.length > 0) {
-            return sectionStack[sectionStack.length - 1].body;
+            return sectionStack[sectionStack.length - 1].section.body;
         }
         return doc.preamble;
     }
@@ -123,9 +123,10 @@ export function parseOrgDocument(rawOrg: string): OrgDocument {
         tableRows = [];
     }
 
-    function closeSectionsDownTo(targetLevel: number) {
-        while (sectionStack.length > 0 && sectionStack[sectionStack.length - 1].heading.level >= targetLevel) {
-            sectionStack.pop();
+    function closeSectionsDownTo(targetLevel: number, currentLineIndex: number) {
+        while (sectionStack.length > 0 && sectionStack[sectionStack.length - 1].section.heading.level >= targetLevel) {
+            const entry = sectionStack.pop()!;
+            entry.section.rawSubtree = lines.slice(entry.startLine, currentLineIndex).join("\n");
         }
     }
 
@@ -408,15 +409,15 @@ export function parseOrgDocument(rawOrg: string): OrgDocument {
                 children: [],
             };
 
-            closeSectionsDownTo(level);
+            closeSectionsDownTo(level, i);
 
             if (sectionStack.length > 0) {
-                sectionStack[sectionStack.length - 1].children.push(newSection);
+                sectionStack[sectionStack.length - 1].section.children.push(newSection);
             } else {
                 doc.sections.push(newSection);
             }
 
-            sectionStack.push(newSection);
+            sectionStack.push({ section: newSection, startLine: i });
             continue;
         }
 
@@ -492,6 +493,141 @@ export function parseOrgDocument(rawOrg: string): OrgDocument {
     // Final flushes
     flushList();
     flushTable();
+    closeSectionsDownTo(0, lines.length);
 
     return doc;
+}
+
+function serializeListItem(item: OrgListItemNode): string {
+    const indentStr = " ".repeat(item.indent);
+    let checkStr = "";
+    if (item.checkbox === "checked") checkStr = "[X] ";
+    else if (item.checkbox === "unchecked") checkStr = "[ ] ";
+    else if (item.checkbox === "partial") checkStr = "[-] ";
+
+    const termStr = item.term ? `${item.term} :: ` : "";
+    const selfLine = `${indentStr}${item.bullet} ${checkStr}${termStr}${item.text}`;
+    if (item.children && item.children.length > 0) {
+        const childLines = item.children.map(serializeListItem).join("\n");
+        return `${selfLine}\n${childLines}`;
+    }
+    return selfLine;
+}
+
+export function serializeOrgNode(node: OrgContentNode): string {
+    switch (node.type) {
+        case "paragraph":
+            return node.text;
+
+        case "blank_line":
+            return "";
+
+        case "horizontal_rule":
+            return "-----";
+
+        case "src_block": {
+            if (node.blockType === "results") {
+                const header = node.name ? `#+RESULTS: ${node.name}` : "#+RESULTS:";
+                const content = node.content.map((l) => `: ${l}`).join("\n");
+                return content ? `${header}\n${content}` : header;
+            }
+            const nameLine = node.name ? `#+NAME: ${node.name}\n` : "";
+            const bType = node.blockType.toUpperCase();
+            const langStr = node.lang ? ` ${node.lang}` : "";
+            const paramStr = node.params ? ` ${node.params}` : "";
+            const blockHeader = `#+BEGIN_${bType}${langStr}${paramStr}`;
+            const blockContent = node.content.join("\n");
+            const blockEnd = `#+END_${bType}`;
+            let res = `${nameLine}${blockHeader}\n${blockContent}\n${blockEnd}`;
+            if (node.results) {
+                const rHeader = node.results.name ? `#+RESULTS: ${node.results.name}` : "#+RESULTS:";
+                const rContent = node.results.content.map((l) => `: ${l}`).join("\n");
+                res += `\n${rHeader}\n${rContent}`;
+            }
+            return res;
+        }
+
+        case "latex_block":
+            return node.content;
+
+        case "drawer": {
+            const lines = [`:${node.name}:`];
+            for (const entry of node.entries) {
+                if (entry.type === "kv" && entry.key) {
+                    lines.push(`:${entry.key}: ${entry.val ?? ""}`);
+                } else if (entry.raw) {
+                    lines.push(entry.raw);
+                }
+            }
+            lines.push(":END:");
+            return lines.join("\n");
+        }
+
+        case "table": {
+            return node.rows
+                .map((row) => {
+                    if (row.isDivider) return "|---|";
+                    return `| ${row.cells.join(" | ")} |`;
+                })
+                .join("\n");
+        }
+
+        case "list": {
+            return node.items.map(serializeListItem).join("\n");
+        }
+
+        default:
+            return "";
+    }
+}
+
+export function serializeOrgSection(section: OrgSectionNode): string {
+    if (section.rawSubtree) {
+        return section.rawSubtree;
+    }
+
+    const heading = section.heading;
+    let headingLine = heading.rawText;
+    if (!headingLine) {
+        const stars = "*".repeat(heading.level || 1);
+        const parts = [stars];
+        if (heading.status) parts.push(heading.status);
+        if (heading.priority) parts.push(`[#${heading.priority}]`);
+        if (heading.statsCookie) parts.push(heading.statsCookie);
+        parts.push(heading.title);
+        if (heading.tags && heading.tags.length > 0) {
+            parts.push(`:${heading.tags.join(":")}:`);
+        }
+        headingLine = parts.join(" ");
+    }
+
+    const lines: string[] = [headingLine];
+
+    for (const node of section.body) {
+        lines.push(serializeOrgNode(node));
+    }
+
+    for (const child of section.children) {
+        lines.push(serializeOrgSection(child));
+    }
+
+    return lines.join("\n");
+}
+
+export function serializeOrgDocument(doc: OrgDocument): string {
+    const lines: string[] = [];
+
+    for (const m of doc.metadata) {
+        lines.push(`#+${m.key}: ${m.val}`);
+    }
+
+    for (const node of doc.preamble) {
+        lines.push(serializeOrgNode(node));
+    }
+
+    for (const section of doc.sections) {
+        lines.push(serializeOrgSection(section));
+    }
+
+    return lines.join("\n");
 }

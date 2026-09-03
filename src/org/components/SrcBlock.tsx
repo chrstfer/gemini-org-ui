@@ -43,9 +43,7 @@ export function SrcBlock({ node }: SrcBlockProps) {
     if (node.blockType === "quote") {
         return (
             <blockquote className="org-quote" data-gemini-org="quote-block">
-                {node.content.map((line, idx) => (
-                    <div key={idx}>{line}</div>
-                ))}
+                {node.content.map((line, idx) => <div key={idx}>{line}</div>)}
             </blockquote>
         );
     }
@@ -53,9 +51,7 @@ export function SrcBlock({ node }: SrcBlockProps) {
     if (node.blockType === "verse") {
         return (
             <div className="org-verse" data-gemini-org="verse-block">
-                {node.content.map((line, idx) => (
-                    <div key={idx}>{line}</div>
-                ))}
+                {node.content.map((line, idx) => <div key={idx}>{line}</div>)}
             </div>
         );
     }
@@ -63,9 +59,7 @@ export function SrcBlock({ node }: SrcBlockProps) {
     if (node.blockType === "center") {
         return (
             <div className="org-center" data-gemini-org="center-block">
-                {node.content.map((line, idx) => (
-                    <div key={idx}>{line}</div>
-                ))}
+                {node.content.map((line, idx) => <div key={idx}>{line}</div>)}
             </div>
         );
     }
@@ -96,7 +90,9 @@ export function SrcBlock({ node }: SrcBlockProps) {
             {node.results && (
                 <details className="org-results-block" data-gemini-org="results-block" open>
                     <summary className="org-results-summary">
-                        <span className="org-results-tag">RESULTS{node.results.name ? `: ${node.results.name}` : ""}</span>
+                        <span className="org-results-tag">
+                            RESULTS{node.results.name ? `: ${node.results.name}` : ""}
+                        </span>
                     </summary>
                     <pre className="org-results-pre">
                         <code>{node.results.content.join("\n")}</code>

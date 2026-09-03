@@ -4,7 +4,7 @@
 
 declare const __DEV__: boolean;
 
-import { CodeBlockManager } from "./dom/code-block.ts";
+import { CodeBlockController } from "./dom/code-block.ts";
 import { DomObserver } from "./dom/observer.ts";
 import { LayoutManager } from "./layout/layout-manager.ts";
 import { SettingsStore } from "./storage/settings-store.ts";
@@ -13,21 +13,17 @@ import { HudController } from "./ui/hud.ts";
 async function bootstrap() {
     const store = new SettingsStore();
     const layout = new LayoutManager();
-    const codeBlockManager = new CodeBlockManager(store);
+    const codeBlockManager = new CodeBlockController(store);
 
     const handleRenderAll = () => {
-        const records = codeBlockManager.getAllRecords();
-        const anyUnrendered = records.some((r) => !r.isRendered);
-        records.forEach((r) => {
-            if (anyUnrendered && !r.isRendered) {
-                r.toggleBtn.click();
-            } else if (!anyUnrendered && r.isRendered) {
-                r.toggleBtn.click();
-            }
-        });
+        codeBlockManager.toggleRenderAll();
     };
 
-    const hud = new HudController(store, layout, handleRenderAll);
+    const handleFoldAll = () => {
+        codeBlockManager.toggleFoldAll();
+    };
+
+    const hud = new HudController(store, layout, handleRenderAll, handleFoldAll);
     const observer = new DomObserver(codeBlockManager);
 
     // 1. Load persisted settings
@@ -58,6 +54,11 @@ async function bootstrap() {
             keyEvent.preventDefault();
             handleRenderAll();
         }
+        // Alt + F : Toggle Fold/Expand All Rendered Blocks
+        if (keyEvent.altKey && (keyEvent.key === "f" || keyEvent.key === "F")) {
+            keyEvent.preventDefault();
+            handleFoldAll();
+        }
     });
 
     // 6. Debug Build Feature: Expose DevTools Inspection API only in dev mode
@@ -84,6 +85,7 @@ async function bootstrap() {
             getBlock: (id: string) => codeBlockManager.getRecord(id),
             getSettings: () => store.settings,
             renderAll: handleRenderAll,
+            foldAll: handleFoldAll,
             scan: () => observer.scan(),
         };
 

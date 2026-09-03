@@ -5,7 +5,7 @@
 
 import { h, render } from "preact";
 import { OrgDocumentView } from "./components/OrgDocumentView.tsx";
-import { parseOrgDocument } from "./parser/block-parser.ts";
+import { parseOrgDocument, serializeOrgDocument, serializeOrgSection } from "./parser/block-parser.ts";
 import { isOrgContent } from "./parser/detector.ts";
 import { OrgDocument } from "./types/ast.ts";
 
@@ -15,6 +15,14 @@ export * from "./parser/inline-lexer.ts";
 export * from "./parser/latex.ts";
 export * from "./types/ast.ts";
 export { OrgDocumentView };
+export {
+    DEFAULT_TOOLBAR_TOOLS,
+    globalToolbarRegistry,
+    OrgToolbar,
+    type ToolbarContext,
+    type ToolbarTool,
+    ToolbarToolRegistry,
+} from "./components/OrgToolbar.tsx";
 
 /**
  * High-level helper to parse and mount an Org document into any target DOM container.
@@ -39,6 +47,8 @@ export const OrgEngine = {
     parse: parseOrgDocument,
     isOrgContent,
     renderToDOM: renderOrgToDOM,
+    serializeSection: serializeOrgSection,
+    serializeDocument: serializeOrgDocument,
 };
 
 // Aliased as OrgParser for seamless migration

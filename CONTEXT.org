@@ -1,0 +1,36 @@
+#+TITLE: Gemini Org-Mode UI Improver Domain Context
+#+DATE: 2026-09-03
+#+OPTIONS: toc:2 num:nil
+
+* Domain Glossary & Ubiquitous Language
+
+- *Org Code Block Shell*: The native Gemini DOM container (~.code-block~, ~code-block.enable-luminous-code-block~) wrapping an AI response code snippet.
+- *In-Situ Sibling Container*: A dedicated ~div.orgmod-rendered-container~ mounted directly beside the native ~<pre><code>~ element, rendering the Org AST while preserving Gemini's host layout and copy action.
+- *Org AST (Abstract Syntax Tree)*: The strongly-typed data representation of an Org-mode document produced by the block parser and inline lexer.
+- *Heading Node & Subtree*: A hierarchical Org section (~*~ through ~******~) containing title tokens, status chips (~TODO~, ~DONE~), priority badges (~[#A]~), tag sets (~:TAG:~), and nested child content folded recursively.
+- *Property Drawer*: Metadata blocks enclosed in ~:PROPERTIES: ... :END:~ containing key-value pairs, collapsible via interactive toggles.
+- *Cookie Progress*: Dynamic checkbox fraction indicators (e.g. ~[2/5]~ or ~[40%]~) that recalculate in real-time as child checkboxes are clicked.
+- *Floating HUD (Heads-Up Display)*: An ephemeral floating control panel elevated ~5.5em~ above the bottom-right corner to clear Gemini prompt inputs and footers.
+- *Detection Engine*: Lexical header analyzer and multi-signal heuristic scoring engine determining if a code block contains authentic Org markup.
+- *Layout Manager*: CSS class coordinator applying surgical max-width adjustments (~86%~ default width) to conversation streams without affecting sidebars.
+- *Session State*: Strictly in-memory per-tab configuration flags (~fullWidth~, ~autoRenderOrg~, ~widthPercent~) that reset to default inactive values on every page load.
+
+* Subsystem Topology
+
+- *~src/org/~ (Core Org Engine)*:
+  - *~src/org/parser/~*: ~block-parser.ts~, ~inline-lexer.ts~, ~detector.ts~, and ~latex.ts~ for tokenizing Org markup and KaTeX math.
+  - *~src/org/components/~*: Preact JSX components (~OrgDocumentView~, ~Section~, ~Drawer~, ~Table~, ~List~, ~ListItem~, ~SrcBlock~, ~Latex~, ~OrgToolbar~).
+- *~src/dom/~ (DOM Orchestration & Mutation Observer)*:
+  - *~src/dom/code-block.ts~*: In-situ mounting, AST caching, and raw/rendered toggle mechanics.
+  - *~src/dom/observer.ts~*: Debounced mutation observer handling dynamic streaming token settlement and cleanup.
+- *~src/ui/~ (Floating HUD & User Controls)*:
+  - *~src/ui/hud.ts~*: Floating control widget, width presets, and hotkey listeners (~Alt+W~, ~Alt+O~, ~Alt+F~).
+- *~src/layout/~ (Layout & Viewport Injection)*:
+  - *~src/layout/layout-manager.ts~*: Full-width stylesheet injector and conversation column width modifier.
+
+* Architectural Decision Records (ADRs)
+
+- [[file:docs/adr/0001-preact-in-situ-rendering.org][ADR 0001: Preact In-Situ Sibling Rendering]] — Accepted (2026-09-03)
+- [[file:docs/adr/0002-ephemeral-session-state.org][ADR 0002: Ephemeral In-Memory Session State]] — Accepted (2026-09-03)
+- [[file:docs/adr/0003-streaming-reconciliation-and-caching.org][ADR 0003: Streaming Reconciliation and AST Caching]] — Accepted (2026-09-03)
+- [[file:docs/adr/0004-katex-math-pipeline.org][ADR 0004: KaTeX Math and LaTeX Greek Rendering Pipeline]] — Accepted (2026-09-03)

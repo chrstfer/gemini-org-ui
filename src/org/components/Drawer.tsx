@@ -21,18 +21,20 @@ export function Drawer({ node }: DrawerProps) {
                     <tbody>
                         {node.entries.map((entry, idx) => (
                             <tr key={idx}>
-                                {entry.type === "kv" ? (
-                                    <>
-                                        <td className="org-prop-key">:{entry.key}:</td>
-                                        <td className="org-prop-val">
-                                            <InlineText text={entry.val || ""} />
+                                {entry.type === "kv"
+                                    ? (
+                                        <>
+                                            <td className="org-prop-key">:{entry.key}:</td>
+                                            <td className="org-prop-val">
+                                                <InlineText text={entry.val || ""} />
+                                            </td>
+                                        </>
+                                    )
+                                    : (
+                                        <td colSpan={2} className="org-prop-raw">
+                                            <InlineText text={entry.raw || ""} />
                                         </td>
-                                    </>
-                                ) : (
-                                    <td colSpan={2} className="org-prop-raw">
-                                        <InlineText text={entry.raw || ""} />
-                                    </td>
-                                )}
+                                    )}
                             </tr>
                         ))}
                     </tbody>

@@ -9,11 +9,18 @@ export class HudController {
     private store: SettingsStore;
     private layout: LayoutManager;
     private onRenderAll: () => void;
+    private onFoldAll: () => void;
 
-    constructor(store: SettingsStore, layout: LayoutManager, onRenderAll: () => void) {
+    constructor(
+        store: SettingsStore,
+        layout: LayoutManager,
+        onRenderAll: () => void,
+        onFoldAll: () => void,
+    ) {
         this.store = store;
         this.layout = layout;
         this.onRenderAll = onRenderAll;
+        this.onFoldAll = onFoldAll;
     }
 
     mount(): void {
@@ -94,8 +101,16 @@ export class HudController {
         renderAllBtn.title = "Toggle Render All Blocks (Alt+O)";
         renderAllBtn.textContent = "Render All";
 
+        const foldAllBtn = document.createElement("button");
+        foldAllBtn.className = "orgmod-hud-btn";
+        foldAllBtn.id = "orgmod-hud-foldall";
+        foldAllBtn.setAttribute("data-gemini-org", "hud-foldall");
+        foldAllBtn.title = "Toggle Fold/Expand All Rendered Blocks (Alt+F)";
+        foldAllBtn.textContent = "Fold All";
+
         row2.appendChild(autoBtn);
         row2.appendChild(renderAllBtn);
+        row2.appendChild(foldAllBtn);
 
         body.appendChild(row1);
         body.appendChild(row2);
@@ -141,6 +156,10 @@ export class HudController {
 
         document.getElementById("orgmod-hud-renderall")?.addEventListener("click", () => {
             this.onRenderAll();
+        });
+
+        document.getElementById("orgmod-hud-foldall")?.addEventListener("click", () => {
+            this.onFoldAll();
         });
 
         this.update();

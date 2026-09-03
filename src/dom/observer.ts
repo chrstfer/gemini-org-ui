@@ -1,71 +1,125 @@
 /**
- * DOM Scanner and MutationObserver with Shadow DOM Support
+ * DOM Scanner and MutationObserver with Shadow DOM Support & Filtering
  */
 
-import { CodeBlockManager } from "./code-block.ts";
+import {
+    KNOWN_LANGUAGES,
+    SELECTOR_CODE_CONTAINER,
+    SELECTOR_DECORATION,
+    SELECTOR_LANG_SPAN,
+    SELECTOR_ROOT,
+} from "../constants.ts";
+import { isOrgContent } from "../org/index.ts";
+import { CodeBlockController } from "./code-block.ts";
 
 export class DomObserver {
-    private manager: CodeBlockManager;
-    private debounceTimer: ReturnType<typeof setTimeout> | null = null;
+    private controller: CodeBlockController;
     private observer: MutationObserver | null = null;
+    private debounceTimer: ReturnType<typeof setTimeout> | null = null;
+    private static readonly EXPLICIT_ORG_RE = /\b(?:org|org-mode|orgmode)\b/i;
 
-    constructor(manager: CodeBlockManager) {
-        this.manager = manager;
+    constructor(controller: CodeBlockController) {
+        this.controller = controller;
     }
 
-    scan(root?: Node): void {
+    /**
+     * Inspects a code block element to determine if it qualifies as Org-mode content
+     */
+    private shouldProcessBlock(blockEl: HTMLElement): boolean {
+        // If block is already registered, let controller handle streaming updates
+        if (this.controller.getRecordByElement(blockEl)) {
+            return true;
+        }
+
+        // Extract language label from header decoration if present
+        const headerEl = blockEl.querySelector<HTMLElement>(SELECTOR_DECORATION);
+        const langSpan = headerEl?.querySelector<HTMLElement>(SELECTOR_LANG_SPAN);
+        const langText = langSpan?.textContent?.trim().toLowerCase() || "";
+
+        // Fast-path: Skip known non-Org languages
+        if (langText && KNOWN_LANGUAGES.has(langText)) {
+            return false;
+        }
+
+        // Fast-path: Explicit Org language declaration
+        if (langText && DomObserver.EXPLICIT_ORG_RE.test(langText)) {
+            return true;
+        }
+
+        // Extract code text content and run Org heuristics
+        const codeEl = blockEl.querySelector<HTMLElement>(SELECTOR_CODE_CONTAINER) ||
+            blockEl.querySelector<HTMLElement>("code") ||
+            blockEl.querySelector<HTMLElement>("pre") ||
+            blockEl;
+        const codeText = (codeEl.textContent || codeEl.innerText || "").replace(/\r\n/g, "\n");
+
+        if (!codeText.trim()) return false;
+
+        return isOrgContent(codeText);
+    }
+
+    /**
+     * Traverses a root node and any nested shadow DOMs to discover Org code blocks
+     */
+    private scanSubtree(targetRoot: ParentNode): void {
+        const candidates = targetRoot.querySelectorAll<HTMLElement>(SELECTOR_ROOT);
+        const discoveredBlocks: HTMLElement[] = [];
+
+        for (const block of Array.from(candidates)) {
+            if (this.shouldProcessBlock(block)) {
+                block.setAttribute("data-code-processed", "true");
+                this.controller.process(block);
+                discoveredBlocks.push(block);
+            }
+        }
+
+        // Log discovered code blocks to extension console with page context
+        if (discoveredBlocks.length > 0) {
+            const pageTitle = typeof document !== "undefined" ? document.title : "";
+            const pageUrl = typeof location !== "undefined" ? location.href : "";
+            console.log(
+                `[GeminiOrgMod] Discovered ${discoveredBlocks.length} Org code block(s) on "${pageTitle}" (${pageUrl}):`,
+                discoveredBlocks,
+            );
+        }
+
+        // Traverse open Shadow DOMs
+        const customElements = targetRoot.querySelectorAll<HTMLElement>("*");
+        for (const el of Array.from(customElements)) {
+            if (el.shadowRoot) {
+                this.scanSubtree(el.shadowRoot);
+            }
+        }
+    }
+
+    /**
+     * Scans the document or specified root node for Org code blocks
+     */
+    public scan(root?: Node): void {
         if (typeof document === "undefined") return;
+
         const targetRoot = (root || document.body) as ParentNode;
         if (!targetRoot || typeof targetRoot.querySelectorAll !== "function") return;
 
-        // Prune any disconnected records from previous DOM removals
-        this.manager.prune();
+        // Prune disconnected DOM records
+        this.controller.prune();
 
-        // Strict top-level selectors only (avoid wildcards matching child decorations)
-        const selectors = [
-            "response-element code-block",
-            "code-block",
-            ".code-block",
-            ".formatted-code-block-internal-container",
-            ".formatted-code",
-            "pre",
-        ];
-
-        const candidateBlocks = targetRoot.querySelectorAll<HTMLElement>(selectors.join(", "));
-        candidateBlocks.forEach((el) => {
-            // 1. Skip if element is a child of a code-block container already being processed
-            const parentBlock = el.closest<HTMLElement>(
-                'code-block, .code-block, .formatted-code-block-internal-container, [data-gemini-org="root"]',
-            );
-            if (parentBlock && parentBlock !== el) {
-                this.manager.process(parentBlock);
-                return;
-            }
-
-            // 2. Skip if element is an internal decoration, toolbar, or rendered view
-            if (
-                el.classList.contains("code-block-decoration") ||
-                el.classList.contains("code-block-decoration-header") ||
-                el.classList.contains("code-block-wrapper") ||
-                el.classList.contains("org-block-toolbar") ||
-                el.classList.contains("org-rendered-view") ||
-                el.closest(".org-rendered-view, .org-block-toolbar, #orgmod-hud")
-            ) {
-                return;
-            }
-
-            this.manager.process(el);
-
-            // 3. Pierce open Shadow DOM if present on custom elements
-            if (el.shadowRoot) {
-                this.scan(el.shadowRoot);
-            }
-        });
+        this.scanSubtree(targetRoot);
     }
 
-    start(): void {
-        if (typeof document === "undefined" || !document.body || typeof MutationObserver === "undefined") return;
+    /**
+     * Starts observing DOM mutations for dynamic streaming and SPA navigation
+     */
+    public start(): void {
+        if (
+            typeof document === "undefined" ||
+            !document.body ||
+            typeof MutationObserver === "undefined"
+        ) {
+            return;
+        }
 
+        // Initial scan
         this.scan();
 
         this.observer = new MutationObserver((mutations) => {
@@ -76,10 +130,10 @@ export class DomObserver {
                     break;
                 }
             }
+
             if (needsScan) {
                 if (this.debounceTimer) clearTimeout(this.debounceTimer);
-                // Fast 25ms debounce for high responsiveness during live streaming
-                this.debounceTimer = setTimeout(() => this.scan(), 25);
+                this.debounceTimer = setTimeout(() => this.scan(), 80);
             }
         });
 
@@ -90,7 +144,10 @@ export class DomObserver {
         });
     }
 
-    stop(): void {
+    /**
+     * Stops the MutationObserver and clears timers
+     */
+    public stop(): void {
         if (this.observer) {
             this.observer.disconnect();
             this.observer = null;

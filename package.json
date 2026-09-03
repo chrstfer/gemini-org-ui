@@ -1,14 +1,14 @@
 {
   "name": "gemini-org-fullwidth",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node build.mjs",
-    "watch": "node build.mjs --watch",
-    "package": "node build.mjs && web-ext build --source-dir dist --overwrite-dest",
-    "test": "node --import tsx --test tests/**/*.test.ts",
-    "lint": "npx web-ext lint --source-dir dist",
-    "typecheck": "tsc --noEmit"
+    "@deno/emit": "jsr:@deno/emit@^0.46.0",
+    "@std/assert": "jsr:@std/assert@^1.0.19",
+    "preact": "https://esm.sh/preact@10.25.4",
+    "preact/hooks": "https://esm.sh/preact@10.25.4/hooks",
+    "preact/jsx-runtime": "https://esm.sh/preact@10.25.4/jsx-runtime",
+    "katex": "https://esm.sh/katex@0.16.21"
   }
 }

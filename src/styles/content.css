@@ -76,7 +76,8 @@ body.orgmod-fullwidth-active div[class*="presented-content"] {
     box-sizing: border-box !important;
 }
 
-/* User query message styling: anchored to the right, leaving ~10% free on the left for the visual indentation queue */
+/* User query message styling: anchored to the right, expanding up to ~92% with natural width */
+body.orgmod-fullwidth-active .conversation-container user-query,
 body.orgmod-fullwidth-active user-query,
 body.orgmod-fullwidth-active user-query-item,
 body.orgmod-fullwidth-active .user-query-container,
@@ -87,14 +88,15 @@ body.orgmod-fullwidth-active div[class*="user-query"] {
     align-items: flex-end !important;
     margin-left: auto !important;
     margin-right: 0 !important;
-    max-width: 90% !important;
-    width: fit-content !important;
+    max-width: 92% !important;
+    width: auto !important;
     box-sizing: border-box !important;
 }
 
 /* The actual text/bubble content inside the user query container */
-body.orgmod-fullwidth-active user-query .bubble,
+body.orgmod-fullwidth-active .conversation-container user-query .query-content,
 body.orgmod-fullwidth-active user-query .query-content,
+body.orgmod-fullwidth-active user-query .bubble,
 body.orgmod-fullwidth-active user-query .user-query-text,
 body.orgmod-fullwidth-active user-query-item .bubble,
 body.orgmod-fullwidth-active user-query-item .query-content,
@@ -506,9 +508,16 @@ div[class*="code-block-decoration"],
     gap: 5px;
 }
 
+/* Heading Actions & Subtree Copy Button */
+.org-heading-actions {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
 /* Tags (:TAG1:TAG2:) */
 .org-tags {
-    margin-left: auto;
     display: inline-flex;
     gap: 3px;
 }
@@ -522,6 +531,53 @@ div[class*="code-block-decoration"],
     padding: 1px 5px;
     border-radius: 3px;
     letter-spacing: 0.3px;
+}
+
+.org-subtree-copy-btn {
+    background: #232528;
+    border: 1px solid #3c4043;
+    color: #9aa0a6;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-family: var(--orgmod-font-mono);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    opacity: 0.65;
+    transition: all 0.15s ease;
+    line-height: 1.2;
+    vertical-align: middle;
+    user-select: none;
+}
+
+.org-heading:hover .org-subtree-copy-btn,
+.org-subtree-copy-btn:hover,
+.org-subtree-copy-btn:focus {
+    opacity: 1;
+    color: #c9d1d9;
+    border-color: #5f6368;
+    background: #2e3034;
+}
+
+.org-subtree-copy-btn:hover {
+    color: #fff;
+    border-color: var(--orgmod-accent);
+}
+
+.org-subtree-copy-btn.copied {
+    opacity: 1;
+    background: #1e4620;
+    color: #81c995;
+    border-color: #2e6633;
+}
+
+.org-copy-icon {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+    fill: currentColor;
 }
 
 /* Status Keywords (TODO, DONE, WAITING, etc.) */

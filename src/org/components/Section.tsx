@@ -4,6 +4,7 @@
 
 import { h } from "preact";
 import { useEffect, useState } from "preact/hooks";
+import { serializeOrgSection } from "../parser/block-parser.ts";
 import { OrgContentNode, OrgSectionNode } from "../types/ast.ts";
 import { Drawer } from "./Drawer.tsx";
 import { InlineText } from "./InlineText.tsx";
@@ -59,6 +60,7 @@ function renderContentNode(node: OrgContentNode, index: number) {
 
 export function Section({ section, forceFoldState }: SectionProps) {
     const [isFolded, setIsFolded] = useState(false);
+    const [copied, setCopied] = useState(false);
     const { heading, body, children } = section;
     const level = heading.level;
 
@@ -70,10 +72,25 @@ export function Section({ section, forceFoldState }: SectionProps) {
 
     const toggleFold = (e: MouseEvent) => {
         const target = e.target as HTMLElement;
-        if (target.closest("a, button, input, .org-checkbox, .org-src-copy-btn")) {
+        if (target.closest("a, button, input, .org-checkbox, .org-src-copy-btn, .org-subtree-copy-btn")) {
             if (!target.closest(".org-fold-btn")) return;
         }
         setIsFolded(!isFolded);
+    };
+
+    const handleCopySubtree = async (e: MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const subtreeText = section.rawSubtree || serializeOrgSection(section);
+        try {
+            if (typeof navigator !== "undefined" && navigator.clipboard) {
+                await navigator.clipboard.writeText(subtreeText);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 1800);
+            }
+        } catch (err) {
+            console.error("[GeminiOrgMod] Failed to copy subtree:", err);
+        }
     };
 
     return (
@@ -120,15 +137,38 @@ export function Section({ section, forceFoldState }: SectionProps) {
                     <InlineText text={heading.title} />
                 </span>
 
-                {heading.tags.length > 0 && (
-                    <span className="org-tags" data-gemini-org="tags">
-                        {heading.tags.map((t, idx) => (
-                            <span key={idx} className="org-tag" data-gemini-org="tag">
-                                :{t}:
-                            </span>
-                        ))}
-                    </span>
-                )}
+                <span className="org-heading-actions" data-gemini-org="heading-actions">
+                    {heading.tags.length > 0 && (
+                        <span className="org-tags" data-gemini-org="tags">
+                            {heading.tags.map((t, idx) => (
+                                <span key={idx} className="org-tag" data-gemini-org="tag">
+                                    :{t}:
+                                </span>
+                            ))}
+                        </span>
+                    )}
+                    <button
+                        type="button"
+                        className={`org-subtree-copy-btn ${copied ? "copied" : ""}`}
+                        data-gemini-org="subtree-copy-btn"
+                        title="Copy subtree"
+                        aria-label="Copy subtree"
+                        onClick={handleCopySubtree}
+                    >
+                        <svg
+                            className="org-copy-icon"
+                            viewBox="0 0 16 16"
+                            width="11"
+                            height="11"
+                            fill="currentColor"
+                            aria-hidden="true"
+                        >
+                            <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z" />
+                            <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z" />
+                        </svg>
+                        <span>{copied ? "Copied!" : "Copy"}</span>
+                    </button>
+                </span>
             </div>
 
             {!isFolded && (

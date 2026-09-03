@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { parseOrgDocument } from "../src/org/parser/block-parser.ts";
+import { parseOrgDocument, serializeOrgSection } from "../src/org/parser/block-parser.ts";
 
 describe("block-parser", () => {
     it("builds recursive AST headline tree with proper nesting", () => {
@@ -138,5 +138,90 @@ F(x; \\lambda) = 1 - e^{-\\lambda x}
             assert.equal(latex.environment, "equation");
             assert.ok(latex.content.includes("1 - e^{-\\lambda x}"));
         }
+    });
+
+    it("captures rawSubtree for each section and its children", () => {
+        const docText = `* Top Level 1
+Top text
+** Level 2 A
+Level 2 A text
+*** Level 3
+Deep text
+** Level 2 B
+Level 2 B text
+* Top Level 2
+Next top text`;
+
+        const ast = parseOrgDocument(docText);
+
+        assert.equal(ast.sections.length, 2);
+        // Top Level 1 includes everything until Top Level 2
+        assert.equal(
+            ast.sections[0].rawSubtree,
+            `* Top Level 1\nTop text\n** Level 2 A\nLevel 2 A text\n*** Level 3\nDeep text\n** Level 2 B\nLevel 2 B text`,
+        );
+
+        // Level 2 A includes Level 3 but not Level 2 B
+        assert.equal(
+            ast.sections[0].children[0].rawSubtree,
+            `** Level 2 A\nLevel 2 A text\n*** Level 3\nDeep text`,
+        );
+
+        // Level 3 subtree
+        assert.equal(
+            ast.sections[0].children[0].children[0].rawSubtree,
+            `*** Level 3\nDeep text`,
+        );
+
+        // Level 2 B subtree
+        assert.equal(
+            ast.sections[0].children[1].rawSubtree,
+            `** Level 2 B\nLevel 2 B text`,
+        );
+
+        // Top Level 2 subtree
+        assert.equal(
+            ast.sections[1].rawSubtree,
+            `* Top Level 2\nNext top text`,
+        );
+    });
+
+    it("serializes AST section and document correctly", () => {
+        const docText = `* TODO [#A] Main Project [1/2] :PROJECT:URGENT:
+Project introduction
+:PROPERTIES:
+:OWNER: chrstfer
+:END:
+** Subtask 1
+- [X] Completed item
+- [ ] Remaining item
+** Subtask 2
+#+BEGIN_SRC python
+print("hello")
+#+END_SRC`;
+
+        const ast = parseOrgDocument(docText);
+        assert.ok(ast.sections[0].rawSubtree);
+
+        // Test serializeOrgSection
+        const serializedSec = serializeOrgSection(ast.sections[0]);
+        assert.ok(serializedSec.includes("* TODO [#A] Main Project [1/2] :PROJECT:URGENT:"));
+        assert.ok(serializedSec.includes(":PROPERTIES:"));
+        assert.ok(serializedSec.includes(":OWNER: chrstfer"));
+        assert.ok(serializedSec.includes("** Subtask 1"));
+        assert.ok(serializedSec.includes("- [X] Completed item"));
+        assert.ok(serializedSec.includes("#+BEGIN_SRC python"));
+
+        // Test fallback AST serialization without rawSubtree
+        const clonedSec = JSON.parse(JSON.stringify(ast.sections[0]));
+        delete clonedSec.rawSubtree;
+        delete clonedSec.children[0].rawSubtree;
+        delete clonedSec.children[1].rawSubtree;
+
+        const reconstructed = serializeOrgSection(clonedSec);
+        assert.ok(reconstructed.includes("* TODO [#A] Main Project [1/2] :PROJECT:URGENT:"));
+        assert.ok(reconstructed.includes(":OWNER: chrstfer"));
+        assert.ok(reconstructed.includes("- [X] Completed item"));
+        assert.ok(reconstructed.includes("#+BEGIN_SRC python"));
     });
 });

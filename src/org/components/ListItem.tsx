@@ -73,9 +73,7 @@ export function ListItem({ item, onChildChange }: ListItemProps) {
 
     return (
         <li
-            className={`org-list-item ${hasCheckbox ? "org-checkbox-item" : ""} ${
-                item.term ? "org-desc-item" : ""
-            }`}
+            className={`org-list-item ${hasCheckbox ? "org-checkbox-item" : ""} ${item.term ? "org-desc-item" : ""}`}
             data-gemini-org={hasCheckbox ? "checkbox-item" : "list-item"}
         >
             {hasCheckbox && (
@@ -97,7 +95,11 @@ export function ListItem({ item, onChildChange }: ListItemProps) {
                 }`}
                 onClick={hasCheckbox ? handleCheckboxToggle : undefined}
             >
-                {item.term && <strong className="org-desc-term"><InlineText text={item.term} />: </strong>}
+                {item.term && (
+                    <strong className="org-desc-term">
+                        <InlineText text={item.term} />:
+                    </strong>
+                )}
                 <InlineText text={item.text} />
             </span>
 

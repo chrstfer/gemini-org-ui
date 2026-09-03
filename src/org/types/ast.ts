@@ -111,6 +111,7 @@ export interface OrgSectionNode {
     heading: OrgHeading;
     body: OrgContentNode[];
     children: OrgSectionNode[];
+    rawSubtree?: string;
 }
 
 export interface OrgDocument {
