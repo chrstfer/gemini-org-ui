@@ -19,6 +19,7 @@ export interface ToolbarTool {
     id: string;
     order?: number;
     title?: string | ((ctx: ToolbarContext) => string);
+    label?: string | ((ctx: ToolbarContext) => string);
     ariaLabel?: string;
     className?: string | ((ctx: ToolbarContext) => string);
     isActive?: (ctx: ToolbarContext) => boolean;
@@ -187,7 +188,9 @@ export function OrgToolbar({
                             }
                         }}
                     >
-                        {tool.render ? tool.render(context) : <span>{tool.id}</span>}
+                        {tool.render ? tool.render(context) : (
+                            <span>{typeof tool.label === "function" ? tool.label(context) : (tool.label || tool.id)}</span>
+                        )}
                     </button>
                 );
             })}

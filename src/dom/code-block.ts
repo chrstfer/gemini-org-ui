@@ -4,7 +4,13 @@
  */
 
 import { h, render } from "preact";
-import { SELECTOR_ACTIONS, SELECTOR_CODE_CONTAINER, SELECTOR_DECORATION } from "../constants.ts";
+import {
+    SELECTOR_ACTIONS,
+    SELECTOR_CODE_CONTAINER,
+    SELECTOR_DECORATION,
+    SELECTOR_LANG_SPAN,
+} from "../constants.ts";
+import { globalLanguageRegistry } from "../languages/index.ts";
 import {
     globalToolbarRegistry,
     OrgDocumentView,
@@ -108,6 +114,14 @@ export class CodeBlockController {
      * Updates the Preact Toolbar view for a given block record
      */
     private updateToolbar(record: CodeBlockRecord): void {
+        const langTools = record.lang ? globalLanguageRegistry.getToolsForLanguage(record.lang) : [];
+        const baseTools = this.toolbarRegistry.getAll();
+        // Merge base tools and language-specific tools, avoiding duplicate tool IDs
+        const toolMap = new Map<string, typeof baseTools[0]>();
+        for (const t of baseTools) toolMap.set(t.id, t);
+        for (const t of langTools) toolMap.set(t.id, t);
+        const mergedTools = Array.from(toolMap.values()).sort((a, b) => (a.order ?? 50) - (b.order ?? 50));
+
         render(
             h(OrgToolbar, {
                 blockId: record.id,
@@ -115,10 +129,11 @@ export class CodeBlockController {
                 allFolded: record.allFolded,
                 onToggleRender: () => this.toggleRender(record),
                 onToggleFold: () => this.toggleFold(record),
-                registry: this.toolbarRegistry,
+                tools: mergedTools,
                 extraContext: {
                     record,
                     controller: this,
+                    lang: record.lang,
                 },
             }),
             record.toolbarMountEl,
@@ -306,6 +321,12 @@ export class CodeBlockController {
         // Create Toolbar Mount Container
         const toolbarMount = this.mountToolbarContainer(blockEl, headerEl);
 
+        // Extract language from header decoration or default to org
+        const langSpan = headerEl?.querySelector<HTMLElement>(SELECTOR_LANG_SPAN);
+        const rawLang = langSpan?.textContent?.trim() || "";
+        const langDef = globalLanguageRegistry.resolve(rawLang);
+        const lang = langDef ? langDef.id : (rawLang.toLowerCase() || "org");
+
         const record: CodeBlockRecord = {
             id: blockId,
             blockEl,
@@ -316,6 +337,7 @@ export class CodeBlockController {
             isRendered: false,
             allFolded: false,
             lastText: currentText,
+            lang,
         };
 
         this.registry.set(blockId, record);

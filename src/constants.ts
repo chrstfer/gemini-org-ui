@@ -2,109 +2,39 @@
  * Global Constants & Canonical DOM Selectors for Gemini UI
  */
 
-export const KNOWN_LANGUAGES: ReadonlySet<string> = new Set([
-    "python",
-    "py",
-    "python3",
-    "py3",
-    "javascript",
-    "js",
-    "jsx",
-    "mjs",
-    "cjs",
-    "typescript",
-    "ts",
-    "tsx",
-    "mts",
-    "cts",
-    "c",
-    "cpp",
-    "c++",
-    "cc",
-    "cxx",
-    "h",
-    "hpp",
-    "csharp",
-    "c#",
-    "cs",
-    "java",
-    "rust",
-    "rs",
-    "go",
-    "golang",
-    "ruby",
-    "rb",
-    "php",
-    "swift",
-    "kotlin",
-    "kt",
-    "scala",
-    "html",
-    "htm",
-    "css",
-    "scss",
-    "sass",
-    "less",
-    "sql",
-    "mysql",
-    "pgsql",
-    "postgres",
-    "plsql",
-    "sqlite",
-    "bash",
-    "shell",
-    "sh",
-    "zsh",
-    "fish",
-    "powershell",
-    "ps1",
-    "batch",
-    "bat",
-    "cmd",
-    "json",
-    "json5",
-    "jsonc",
-    "yaml",
-    "yml",
-    "toml",
-    "xml",
-    "svg",
-    "markdown",
-    "md",
-    "latex",
-    "tex",
-    "graphql",
-    "gql",
-    "dockerfile",
-    "docker",
-    "makefile",
-    "make",
-    "cmake",
-    "r",
-    "julia",
-    "jl",
-    "lua",
-    "perl",
-    "pl",
-    "haskell",
-    "hs",
-    "elixir",
-    "ex",
-    "erlang",
-    "erl",
-    "dart",
-    "assembly",
-    "asm",
-    "wasm",
-    "diff",
-    "patch",
-    "vim",
-    "viml",
-    "ini",
-    "env",
-    "proto",
-    "protobuf",
-]);
+import { globalLanguageRegistry } from "./languages/index.ts";
+
+/**
+ * Dynamic set of all recognized non-Org languages derived from the Language Registry
+ */
+export const KNOWN_LANGUAGES: ReadonlySet<string> = {
+    has(value: string): boolean {
+        const lower = value.toLowerCase();
+        // Ignore "org" aliases as they should be processed as Org-mode
+        if (lower === "org" || lower === "org-mode" || lower === "orgmode" || lower === "text/org") {
+            return false;
+        }
+        return globalLanguageRegistry.isKnown(lower);
+    },
+    get size(): number {
+        return globalLanguageRegistry.getAllAliases().size;
+    },
+    [Symbol.iterator](): IterableIterator<string> {
+        return globalLanguageRegistry.getAllAliases()[Symbol.iterator]();
+    },
+    forEach(callbackfn: (value: string, value2: string, set: ReadonlySet<string>) => void): void {
+        globalLanguageRegistry.getAllAliases().forEach((v) => callbackfn(v, v, this));
+    },
+    entries(): IterableIterator<[string, string]> {
+        return Array.from(globalLanguageRegistry.getAllAliases().entries())[Symbol.iterator]();
+    },
+    keys(): IterableIterator<string> {
+        return globalLanguageRegistry.getAllAliases().keys();
+    },
+    values(): IterableIterator<string> {
+        return globalLanguageRegistry.getAllAliases().values();
+    },
+};
 
 // Canonical DOM selectors for Gemini UI
 export const SELECTOR_ROOT = ".response-element code-block, response-element code-block, code-block";

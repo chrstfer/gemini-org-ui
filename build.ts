@@ -14,6 +14,7 @@ await Deno.mkdir(dist, { recursive: true });
 // Read KaTeX CSS
 let katexCss = "";
 try {
+    // TODO: Download a specific version and store it locally. We need to stop bundling so tightly and keep 3rd party dependencies as their own files.
     const res = await fetch("https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css");
     if (res.ok) {
         katexCss = await res.text();
@@ -23,10 +24,16 @@ try {
 }
 
 const contentCss = await Deno.readTextFile("src/styles/content.css");
+
+// TODO: change the build process to just include the KaTeX .min.css and copy it over
 await Deno.writeTextFile(`${dist}/content.css`, `${katexCss}\n\n${contentCss}`);
+
+
 await Deno.copyFile("manifest.json", `${dist}/manifest.json`);
 
+
 // Bundle src/content.ts into dist/content.js
+// TODO: bundle things less tightly, have a few logically related bundles and have content.js do relevant imports and such.
 console.log(`Bundling with Deno emit (${isDev ? "DEVELOPMENT / DEBUG" : "PRODUCTION"})...`);
 const entryUrl = new URL("./src/content.ts", import.meta.url);
 const importMapUrl = new URL("./deno.json", import.meta.url).href;

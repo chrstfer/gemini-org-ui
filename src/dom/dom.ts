@@ -14,6 +14,7 @@ export interface CodeBlockRecord {
     isRendered: boolean;
     allFolded: boolean;
     lastText: string;
+    lang?: string;
     cachedDoc?: OrgDocument;
 }
 
