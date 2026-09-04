@@ -1,0 +1,16 @@
+#+TITLE: Issue Tracker: GitHub Issues
+#+DATE: 2026-09-02
+
+Issues for this repo live in GitHub Issues. Specs are formatted in Org-mode in issue descriptions.
+
+* Operations
+
+- *Create an issue*: Use =gh issue create --title "<title>" --body "<body>" -R <org>/<repo>=.
+- *Fetch an issue*: Use =gh issue view <number> --json title,body,state,labels -R <org>/<repo>=.
+- *Close an issue*: Use =gh issue close <number> --comment "<resolution summary>" -R <org>/<repo>=.
+- *Triage Labels*: Apply label via =gh issue edit <number> --add-label "<label>" -R <org>/<repo>=.
+
+* Format & Conventions
+
+- Issue bodies, specifications, and discussions follow Org-mode syntax.
+- Use Org-mode checkboxes (=- [ ]=) for story checklists and acceptance criteria.

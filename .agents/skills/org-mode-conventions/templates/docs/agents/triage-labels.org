@@ -1,0 +1,14 @@
+#+TITLE: Triage Labels
+#+DATE: 2026-09-02
+
+Canonical triage labels used across engineering skills.
+
+* Roles & Label Strings
+
+| Role | Label String | Meaning |
+| :--- | :--- | :--- |
+| *needs-triage* | =needs-triage= | Incoming request or issue needing review |
+| *needs-info* | =needs-info= | Waiting for clarification from the human |
+| *ready-for-agent* | =ready-for-agent= | Fully specified work ready for AI execution |
+| *ready-for-human* | =ready-for-human= | Work requiring human decision or manual review |
+| *wontfix* | =wontfix= | Explicitly rejected or closed without action |

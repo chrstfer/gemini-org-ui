@@ -1,0 +1,29 @@
+#+TITLE: Spec: <Feature Name>
+#+DATE: <Date>
+#+PROPERTY: Status ready-for-agent
+
+* Problem Statement
+<The problem that the user is facing, from the user's perspective.>
+
+* Solution
+<The solution to the problem, from the user's perspective.>
+
+* User Stories
+1. [ ] As an <actor>, I want a <feature>, so that <benefit>
+2. [ ] As an <actor>, I want a <feature>, so that <benefit>
+
+* Implementation Decisions
+- *Module*: <Target module to build or modify>
+- *Interface*: <Function or trait signatures>
+- *Schema*: <Data structures, models, migrations>
+- *Decisions*: <Key choices and architecture boundaries>
+
+* Testing Decisions
+- *Seam*: <Highest testing boundary to exercise the behavior>
+- *Strategy*: <Test cases and verification approach>
+
+* Out of Scope
+- <Explicitly excluded features or boundaries>
+
+* Further Notes
+- <Additional context or references>

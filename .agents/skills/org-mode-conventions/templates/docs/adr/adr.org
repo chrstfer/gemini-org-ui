@@ -1,0 +1,23 @@
+#+TITLE: ADR <NNNN>: <Title>
+#+DATE: <Date>
+
+:PROPERTIES:
+:STATUS: Accepted
+:END:
+
+* Status
+Accepted
+
+* Context
+<Describe the problem, architectural forces, business context, and alternatives considered.>
+
+* Decision
+<State the chosen architectural design or pattern clearly and unambiguously.>
+
+* Consequences
+** Positive
+- <Benefit 1: e.g. improved decoupling, testability, locality>
+- <Benefit 2: ...>
+
+** Negative
+- <Trade-off or cost: e.g. additional indirection, migration effort>

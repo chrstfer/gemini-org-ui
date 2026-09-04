@@ -1,0 +1,27 @@
+#+TITLE: Research Report: <Topic>
+#+AUTHOR: DeepMind Antigravity Researcher
+#+DATE: <Date>
+#+OPTIONS: toc:3 num:t ^:{}
+
+* Executive Summary & Strategic Verdict
+<High-level findings, strategic synthesis, and direct answer to the research question.>
+
+* Comparative Evaluation
+| Approach / Library | Strengths | Weaknesses | Verdict |
+|--------------------+-----------+------------+---------|
+| <Option A>         | ...       | ...        | ...     |
+| <Option B>         | ...       | ...        | ...     |
+
+* Detailed Primary Source Investigation
+** Source 1: <Name or URL>
+#+BEGIN_QUOTE
+"<Key primary quotation, specification excerpt, or benchmark metric...>"
+#+END_QUOTE
+
+<Analysis of the primary claim and validation in the codebase.>
+
+* Architectural Decision & Integration Plan
+<Actionable steps for integrating the findings into the system architecture.>
+
+* References & Citations
+[fn:1] [[https://example.com/spec][Primary Specification Title]]

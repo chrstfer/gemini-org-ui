@@ -1,0 +1,15 @@
+#+TITLE: Wayfinder Map: <Effort Name>
+#+DATE: <Timestamp>
+
+:PROPERTIES:
+:END:
+
+* Decisions So Far
+- [[file:issues/01-task.org][01: Task Name]] — Gist of decision and context pointer.
+
+* Open Frontier & Task List
+- [ ] [[file:issues/02-task.org][02: Task Name]] [Type: task] [Blocked by: none]
+- [ ] [[file:issues/03-task.org][03: Task Name]] [Type: research] [Blocked by: 02]
+
+* Fog of War & Open Questions
+- <Unmapped questions and unknown areas to explore>

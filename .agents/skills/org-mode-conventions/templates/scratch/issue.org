@@ -1,0 +1,18 @@
+#+TITLE: Issue <NN>: <Short Title>
+#+DATE: <Timestamp>
+
+:PROPERTIES:
+:TYPE: task            ; task | research | prototype | grilling
+:STATUS: open          ; open | claimed | resolved
+:BLOCKED_BY:           ; comma-separated numbers (e.g. 01, 02)
+:ASSIGNEE:             ; user or agent ID
+:END:
+
+* Question / Task Description
+<Description of work or research question>
+
+* Answer / Resolution
+<Appended upon completion>
+
+* Comments
+<Discussion history>

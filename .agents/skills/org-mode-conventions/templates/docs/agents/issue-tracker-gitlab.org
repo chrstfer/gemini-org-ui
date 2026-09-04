@@ -1,0 +1,15 @@
+#+TITLE: Issue Tracker: GitLab Issues
+#+DATE: 2026-09-02
+
+Issues for this repo live in GitLab Issues. Specs are formatted in Org-mode in issue descriptions.
+
+* Operations
+
+- *Create an issue*: Use =glab issue create --title "<title>" --description "<body>" -R <org>/<repo>=.
+- *Fetch an issue*: Use =glab issue view <number> -R <org>/<repo>=.
+- *Close an issue*: Use =glab issue close <number> -R <org>/<repo>=.
+
+* Format & Conventions
+
+- Issue descriptions and notes follow Org-mode syntax.
+- Use Org-mode checkboxes (=- [ ]=) for story checklists and acceptance criteria.

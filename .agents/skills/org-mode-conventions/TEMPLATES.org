@@ -1,0 +1,30 @@
+#+TITLE: Org-Mode Engineering Templates Catalog
+#+DATE: 2026-09-02
+#+OPTIONS: toc:2 num:nil
+
+* Overview
+This catalog provides reference Emacs Org-mode templates used across the engineering skills suite.
+Templates live in the =templates/= directory mirroring the repository layout.
+
+* 1. Repository Setup & Agent Guidance (=docs/agents/=)
+Templates copied or referenced during interactive repository setup:
+
+- [[file:templates/docs/agents/issue-tracker-local.org][Local Issue Tracker]] (=docs/agents/issue-tracker.org=) :: Local Org-mode tracking under =.scratch/<feature>/=.
+- [[file:templates/docs/agents/issue-tracker-github.org][GitHub Issue Tracker]] (=docs/agents/issue-tracker.org=) :: GitHub Issues integration via =gh= CLI.
+- [[file:templates/docs/agents/issue-tracker-gitlab.org][GitLab Issue Tracker]] (=docs/agents/issue-tracker.org=) :: GitLab Issues integration via =glab= CLI.
+- [[file:templates/docs/agents/domain.org][Domain Docs]] (=docs/agents/domain.org=) :: Consumer rules for =CONTEXT.org= and ADRs.
+- [[file:templates/docs/agents/triage-labels.org][Triage Labels]] (=docs/agents/triage-labels.org=) :: Canonical label vocabulary for triage.
+
+* 2. Domain & System Topology (=CONTEXT.org=)
+- [[file:templates/CONTEXT.org][Domain Context Template]] (=CONTEXT.org=) :: Root domain glossary, ubiquitous language, and subsystem topology.
+
+* 3. Architectural Decision Records (=docs/adr/=)
+- [[file:templates/docs/adr/adr.org][ADR Template]] (=docs/adr/<NNNN>-<slug>.org=) :: Architecture decision record with =:STATUS: Accepted= property drawer.
+
+* 4. Research Reports (=docs/research/=)
+- [[file:templates/docs/research/research.org][Research Report Template]] (=docs/research/<date>-<topic>.org=) :: Investigation report with comparative tables and footnotes.
+
+* 5. Feature Specs & Wayfinding (=.scratch/=)
+- [[file:templates/scratch/spec.org][Feature Spec Template]] (=.scratch/<feature>/spec.org=) :: Specification with user stories (=- [ ]=) and test seams.
+- [[file:templates/scratch/map.org][Wayfinder Map Template]] (=.scratch/<effort>/map.org=) :: Exploration map with decisions, open frontier, and fog of war.
+- [[file:templates/scratch/issue.org][Child Issue Ticket Template]] (=.scratch/<effort>/issues/<NN>-<slug>.org=) :: Numbered issue ticket with =:PROPERTIES:= drawer.

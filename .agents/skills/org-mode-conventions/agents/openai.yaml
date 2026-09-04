@@ -1,0 +1,5 @@
+interface:
+  display_name: "Org-Mode Conventions"
+  short_description: "Enforce Org-mode formatting and conventions across engineering skills"
+policy:
+  allow_implicit_invocation: true

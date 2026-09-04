@@ -1,0 +1,20 @@
+#+TITLE: <Project> Domain Context
+#+DATE: <Date>
+#+OPTIONS: toc:2 num:nil
+
+* Domain Glossary & Ubiquitous Language
+Define all core terms, entities, and concepts here. Use these terms consistently across specs, code, and discussions.
+
+- *<Term>*: <Definition of the domain concept, what it includes and excludes.>
+- *<Term>*: <Definition of the domain concept, what it includes and excludes.>
+
+* Subsystem Topology
+High-level structure and relationships between core subsystems and modules.
+
+- *<Subsystem>*: <Responsibility, interfaces exposed, and dependencies.>
+- *<Subsystem>*: <Responsibility, interfaces exposed, and dependencies.>
+
+* Architectural Decision Records (ADRs)
+Index of accepted architectural decisions:
+
+- [[file:docs/adr/0001-example-decision.org][0001: Example Decision Title]] — Accepted (<Date>)
