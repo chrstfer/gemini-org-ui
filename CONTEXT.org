@@ -23,6 +23,9 @@
 - *~src/dom/~ (DOM Orchestration & Mutation Observer)*:
   - *~src/dom/code-block.ts~*: In-situ mounting, AST caching, and raw/rendered toggle mechanics.
   - *~src/dom/observer.ts~*: Debounced mutation observer handling dynamic streaming token settlement and cleanup.
+- *~src/languages/~ (Language Registry & Tool Index)*:
+  - *~src/languages/registry.ts~*: Dynamic ~LanguageRegistry~ engine for alias normalization and tool index mapping.
+  - *~src/languages/definitions.ts~*: Pure TypeScript database of 37 recognized languages and specialized language tools.
 - *~src/ui/~ (Floating HUD & User Controls)*:
   - *~src/ui/hud.ts~*: Floating control widget, width presets, and hotkey listeners (~Alt+W~, ~Alt+O~, ~Alt+F~).
 - *~src/layout/~ (Layout & Viewport Injection)*:
