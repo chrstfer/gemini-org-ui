@@ -15,3 +15,9 @@ Local Org-mode files under `.scratch/<feature>/`. See `docs/agents/issue-tracker
 
 ### Domain docs
 Single-context (`CONTEXT.org` at repo root, `docs/adr/` for ADRs). See `docs/agents/domain.org`.
+
+## Sequential Thinking & Reasoning
+When conducting sequential thinking or deep analysis, calibrate thought depth dynamically based on task complexity (typically between 4 and 32 steps) rather than forcing a rigid count:
+- **Focused checks / single-seam refactors**: 4–8 thoughts.
+- **Architectural design / standard research**: 10–16 thoughts.
+- **Complex migrations / subtle async flows / deep algorithms**: 18–32 thoughts.

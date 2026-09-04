@@ -64,17 +64,27 @@ const version = manifest.version || "0.1.0";
 const zipFileName = `gemini-org-ui-${version}.zip`;
 
 try {
-    const zipCmd = new Deno.Command("zip", {
-        args: ["-r", "-q", zipFileName, "manifest.json", "content.js", "content.css"],
+    const p7zCmd = new Deno.Command("7z", {
+        args: [
+            "a",
+            "-tzip",
+            "-mx=9",
+            "-aoa",
+            "-bd",
+            zipFileName,
+            "manifest.json",
+            "content.js",
+            "content.css",
+        ],
         cwd: dist,
     });
-    const { code: zipCode, stderr } = await zipCmd.output();
-    if (zipCode === 0) {
-        console.log(`✓ Zip package created: dist/${zipFileName}`);
+    const { code: p7zCode, stderr } = await p7zCmd.output();
+    if (p7zCode === 0) {
+        console.log(`✓ Zip package created via 7z: dist/${zipFileName}`);
     } else {
         const errText = new TextDecoder().decode(stderr);
-        console.warn(`Warning: Could not create zip archive: ${errText}`);
+        console.warn(`Warning: Could not create zip archive with 7z: ${errText}`);
     }
 } catch (e) {
-    console.warn("Warning: Failed to execute zip command:", e);
+    console.warn("Warning: Failed to execute 7z command:", e);
 }
